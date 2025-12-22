@@ -21,14 +21,14 @@ const mod: HtmlnanoModule<SvgoConfig> = {
                 node.content = [result.data];
                 return node;
             } catch (error) {
-                console.error('htmlnano fails to minify the svg:');
-                console.error(error);
-                if (
+                const isSvgoParserError = Boolean(
                     error
                     && typeof error === 'object'
                     && 'name' in error
                     && error.name === 'SvgoParserError'
-                ) {
+                );
+                if (!options.skipInternalWarnings && !isSvgoParserError) {
+                    console.error('htmlnano fails to minify the svg:');
                     console.error(error);
                 }
                 // We return the node as-is
