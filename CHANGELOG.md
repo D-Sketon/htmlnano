@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.0] - 2025-12-22
+
+### Changed
+
+* SVGO has been upgraded to v4, which includes [some breaking changes](https://svgo.dev/docs/migrations/migration-from-v3-to-v4/). This is the main reason for the major version bump in this release of htmlnano.
+
+
+### Added
+
+* [CLI version](https://htmlnano.netlify.app/usage#cli)
+
+
 ## [2.1.5] - 2025-09-19
 
 ### Fixed
