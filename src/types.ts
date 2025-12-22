@@ -72,6 +72,6 @@ export type HtmlnanoModule<Options = any> = {
     default?: (
         tree: PostHTMLTreeLike,
         options: Partial<HtmlnanoOptions>,
-        moduleOptions: OptionalOptions<Options>,
+        moduleOptions: OptionalOptions<Options>
     ) => PostHTMLTreeLike | Promise<PostHTMLTreeLike>;
 };
