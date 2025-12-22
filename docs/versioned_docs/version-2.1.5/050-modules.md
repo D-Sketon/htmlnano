@@ -682,7 +682,7 @@ Minified:
 
 
 ### minifySvg
-Minifies SVG inside `<svg>` tags using [SVGO](https://github.com/svg/svgo/).
+Minifies SVG inside `<svg>` tags using [SVGO@3](https://github.com/svg/svgo/).
 
 #### Options
 See [the documentation of SVGO](https://github.com/svg/svgo/blob/master/README.md) for all supported options.
