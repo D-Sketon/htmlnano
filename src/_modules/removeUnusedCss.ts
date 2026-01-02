@@ -63,9 +63,9 @@ const purgeFromHtml = function (tree: PostHTMLTreeLike) {
     return () => selectors;
 };
 
-function processStyleNodePurgeCSS(tree: PostHTMLTreeLike, styleNode: PostHTML.Node, purgecssOptions: object, purgecss: typeof import('purgecss')) {
+function processStyleNodePurgeCSS(tree: PostHTMLTreeLike, styleNode: PostHTML.Node, purgecssOptions: object, purgecss: typeof import('purgecss'), extractor: () => string[]) {
     const css = extractCssFromStyleNode(styleNode)!;
-    return runPurgecss(tree, css, purgecssOptions, purgecss)
+    return runPurgecss(tree, css, purgecssOptions, purgecss, extractor)
         .then((css) => {
             if (css.trim().length === 0) {
                 // @ts-expect-error -- explicitly remove the tag
@@ -77,7 +77,7 @@ function processStyleNodePurgeCSS(tree: PostHTMLTreeLike, styleNode: PostHTML.No
         });
 }
 
-function runPurgecss(tree: PostHTMLTreeLike, css: string, userOptions: Partial<PurgeCSSOptions>, purgecss: typeof import('purgecss')) {
+function runPurgecss(tree: PostHTMLTreeLike, css: string, userOptions: Partial<PurgeCSSOptions>, purgecss: typeof import('purgecss'), extractor: () => string[]) {
     if (typeof userOptions !== 'object') {
         userOptions = {};
     }
@@ -94,7 +94,7 @@ function runPurgecss(tree: PostHTMLTreeLike, css: string, userOptions: Partial<P
             extension: 'css'
         }],
         extractors: [{
-            extractor: purgeFromHtml(tree),
+            extractor,
             extensions: ['html']
         }]
     };
@@ -116,6 +116,7 @@ const mod: HtmlnanoModule<RemoveUnusedCssOptions> = {
         const promises: Promise<unknown>[] = [];
 
         let html: string;
+        let extractor: () => string[];
 
         const purgecss = await optionalImport<typeof import('purgecss')>('purgecss');
         const uncss = await optionalImport('uncss');
@@ -124,7 +125,8 @@ const mod: HtmlnanoModule<RemoveUnusedCssOptions> = {
             if (isStyleNode(node)) {
                 if (userOptions.tool === 'purgeCSS') {
                     if (purgecss) {
-                        promises.push(processStyleNodePurgeCSS(tree, node, userOptions, purgecss));
+                        extractor ??= purgeFromHtml(tree);
+                        promises.push(processStyleNodePurgeCSS(tree, node, userOptions, purgecss, extractor));
                     }
                 } else {
                     if (uncss) {
