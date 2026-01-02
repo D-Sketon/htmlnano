@@ -46,7 +46,7 @@ const mod: HtmlnanoModule<MinifyOptions> = {
             }
 
             if (node.attrs) {
-                promises.push.apply(processNodeWithOnAttrs(node, terserOptions, terser));
+                promises.push(...processNodeWithOnAttrs(node, terserOptions, terser));
             }
 
             return node;
