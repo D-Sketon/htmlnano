@@ -24,6 +24,7 @@ const mod: HtmlnanoModule<CssnanoOptions> = {
         const promises: Promise<void>[] = [];
 
         let p: Promise<void> | undefined;
+        let postCssInstance: ReturnType<typeof import('postcss').default>;
 
         tree.walk((node) => {
         // Skip SRI, reasons are documented in "minifyJs" module
@@ -32,12 +33,14 @@ const mod: HtmlnanoModule<CssnanoOptions> = {
             }
 
             if (isStyleNode(node)) {
-                p = processStyleNode(node, cssnanoOptions, cssnano, postcss);
+                postCssInstance ??= postcss([cssnano(cssnanoOptions)]);
+                p = processStyleNode(node, postCssInstance);
                 if (p) {
                     promises.push(p);
                 }
             } else if (node.attrs && node.attrs.style) {
-                p = processStyleAttr(node, cssnanoOptions, cssnano, postcss);
+                postCssInstance ??= postcss([cssnano(cssnanoOptions)]);
+                p = processStyleAttr(node, postCssInstance);
                 if (p) {
                     promises.push(p);
                 }
@@ -52,7 +55,7 @@ const mod: HtmlnanoModule<CssnanoOptions> = {
 
 export default mod;
 
-function processStyleNode(styleNode: PostHTML.Node, cssnanoOptions: CssnanoOptions, cssnano: typeof import('cssnano'), postcss: typeof import('postcss').default) {
+function processStyleNode(styleNode: PostHTML.Node, postCssInstance: ReturnType<typeof import('postcss').default>) {
     let css = extractCssFromStyleNode(styleNode);
     if (!css) return;
 
@@ -64,7 +67,7 @@ function processStyleNode(styleNode: PostHTML.Node, cssnanoOptions: CssnanoOptio
         css = strippedCss;
     }
 
-    return postcss([cssnano(cssnanoOptions)])
+    return postCssInstance
         .process(css, postcssOptions)
         .then((result) => {
             if (isCdataWrapped) {
@@ -75,7 +78,7 @@ function processStyleNode(styleNode: PostHTML.Node, cssnanoOptions: CssnanoOptio
         });
 }
 
-function processStyleAttr(node: PostHTML.Node, cssnanoOptions: CssnanoOptions, cssnano: typeof import('cssnano'), postcss: typeof import('postcss').default) {
+function processStyleAttr(node: PostHTML.Node, postCssInstance: ReturnType<typeof import('postcss').default>) {
     // CSS "color: red;" is invalid. Therefore it should be wrapped inside some selector:
     // a{color: red;}
     const wrapperStart = 'a{';
@@ -87,7 +90,7 @@ function processStyleAttr(node: PostHTML.Node, cssnanoOptions: CssnanoOptions, c
 
     const wrappedStyle = wrapperStart + (node.attrs.style || '') + wrapperEnd;
 
-    return postcss([cssnano(cssnanoOptions)])
+    return postCssInstance
         .process(wrappedStyle, postcssOptions)
         .then((result) => {
             const minifiedCss = result.css;
