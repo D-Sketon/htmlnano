@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Merge Dependabot PR if eligible
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const prs = context.payload.workflow_run.pull_requests;
