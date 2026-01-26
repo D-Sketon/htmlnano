@@ -10,6 +10,7 @@ export type PostHTMLTreeLike = [PostHTML.Node] & PostHTML.NodeAPI & {
     } | undefined;
 
     render(): string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- posthtml render options are untyped
     render(node: PostHTML.Node | PostHTMLTreeLike, renderOptions?: any): string;
 };
 
@@ -26,6 +27,7 @@ export interface HtmlnanoOptions {
         amphtml?: boolean;
     };
     collapseWhitespace?: 'conservative' | 'all' | 'aggressive';
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- custom options depend on consumer
     custom?: MaybeArray<(tree: PostHTMLTreeLike, options?: any) => (PostHTML.Node | PostHTMLTreeLike)>;
     deduplicateAttributeValues?: boolean;
     minifyUrls?: URL | string | false;
@@ -81,6 +83,7 @@ type OptionalOptions<T> = T extends boolean | string | Function | number | null 
     : T extends object
         ? Partial<T>
         : T;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- module options default to any
 export type HtmlnanoModule<Options = any> = {
     onAttrs?: (options: Partial<HtmlnanoOptions>, moduleOptions: OptionalOptions<Options>) => HtmlnanoModuleAttrsHandler;
     onContent?: (options: Partial<HtmlnanoOptions>, moduleOptions: OptionalOptions<Options>) => HtmlnanoModuleContentHandler;

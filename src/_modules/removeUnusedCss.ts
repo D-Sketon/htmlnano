@@ -9,6 +9,7 @@ const uncssOptions = {
     stylesheets: []
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- uncss has no types
 function processStyleNodeUnCSS(html: string, styleNode: PostHTML.Node, uncssOptions: object, uncss: any) {
     const css = extractCssFromStyleNode(styleNode)!;
 
@@ -25,6 +26,7 @@ function processStyleNodeUnCSS(html: string, styleNode: PostHTML.Node, uncssOpti
     });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- uncss callback uses untyped args
 function runUncss(html: string, css: string, userOptions: object, uncss: (...args: any[]) => void) {
     if (typeof userOptions !== 'object') {
         userOptions = {};

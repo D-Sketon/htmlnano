@@ -133,6 +133,7 @@ const modules = {
     removeUnusedCss: () => interop(import('./_modules/removeUnusedCss')),
     sortAttributes: () => interop(import('./_modules/sortAttributes')),
     sortAttributesWithLists: () => interop(import('./_modules/sortAttributesWithLists'))
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- module options vary per module
 } satisfies Record<string, () => Promise<HtmlnanoModule<any>>>;
 
 const htmlnano = Object.assign(function htmlnano(optionsRun: HtmlnanoOptions = {}, presetRun?: HtmlnanoPreset) {
@@ -184,15 +185,19 @@ const htmlnano = Object.assign(function htmlnano(optionsRun: HtmlnanoOptions = {
                 : (await import(`./_modules/${moduleName}.mjs`)) as HtmlnanoModule;
 
             if (typeof mod.onAttrs === 'function') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- module options are generic
                 attrsHandlers.push(mod.onAttrs(options, moduleOptions as Partial<any>));
             }
             if (typeof mod.onContent === 'function') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- module options are generic
                 contentsHandlers.push(mod.onContent(options, moduleOptions as Partial<any>));
             }
             if (typeof mod.onNode === 'function') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- module options are generic
                 nodeHandlers.push(mod.onNode(options, moduleOptions as Partial<any>));
             }
             if (typeof mod.default === 'function') {
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any -- module options are generic
                 promise = promise.then(async tree => await mod.default!(tree, options, moduleOptions as Partial<any>));
             }
         }
