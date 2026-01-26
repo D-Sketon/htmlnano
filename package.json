@@ -5,14 +5,15 @@
   "author": "Kirill Maltsev <maltsevkirill@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "clean": "rimraf dist",
+    "clean": "rimraf dist coverage",
     "build": "npm run clean && bunchee",
     "postbuild": "chmod +x dist/bin.js",
     "compile": "npm run build",
     "lint": "eslint --fix .",
+    "test:mocha": "mocha --timeout 5000 --require @swc-node/register --recursive --check-leaks --globals addresses 'test/**/*.ts'",
     "pretest": "npm run lint && npm run compile",
-    "test": ":",
-    "posttest": "mocha --timeout 5000 --require @swc-node/register --recursive --check-leaks --globals addresses 'test/**/*.ts'",
+    "test": "c8 -r text -r html npm run test:mocha",
+    "posttest": "c8 check-coverage --lines 80 --per-file",
     "prepare": "npm run compile"
   },
   "files": [
@@ -68,6 +69,7 @@
     "@types/mocha": "^10.0.10",
     "@types/node": "^25.0.0",
     "bunchee": "^6.5.1",
+    "c8": "^10.1.3",
     "cssnano": "^7.0.0",
     "eslint": "^9.25.1",
     "eslint-config-flat-gitignore": "^2.1.0",
@@ -123,6 +125,12 @@
     "uncss": {
       "optional": true
     }
+  },
+  "c8": {
+    "exclude": [
+      "dist/**/*.js",
+      "dist/**/*.cjs"
+    ]
   },
   "repository": {
     "type": "git",
