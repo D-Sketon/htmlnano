@@ -1,13 +1,16 @@
 import type { HtmlnanoModule } from '../types';
-import { attributesWithLists } from './collapseAttributeWhitespace';
+import { isListAttribute } from './collapseAttributeWhitespace';
 
 /** Deduplicate values inside list-like attributes (e.g. class, rel) */
 const mod: HtmlnanoModule = {
     onAttrs() {
-        return (attrs) => {
+        return (attrs, node) => {
             const newAttrs = attrs;
+            const tagName = node.tag ? node.tag.toLowerCase() : undefined;
+
             Object.keys(attrs).forEach((attrName) => {
-                if (!attributesWithLists.has(attrName)) {
+                const attrNameLower = attrName.toLowerCase();
+                if (!isListAttribute(attrNameLower, tagName)) {
                     return;
                 }
 

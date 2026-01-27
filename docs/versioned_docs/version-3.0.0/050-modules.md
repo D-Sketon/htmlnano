@@ -48,7 +48,7 @@ Minified:
 ```
 
 ### collapseAttributeWhitespace
-Collapse redundant white spaces in list-like attributes (`class`, `rel`, `ping`).
+Collapse redundant white spaces in list-like attributes (`class`, `rel`, `ping`, `sandbox`, `headers`, `dropzone`, `sizes` on `<link>`).
 
 #### Example
 Source:

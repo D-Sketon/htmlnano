@@ -1,6 +1,6 @@
 // class, rel, ping
 import type { HtmlnanoModule, PostHTMLTreeLike } from '../types';
-import { attributesWithLists } from './collapseAttributeWhitespace';
+import { isListAttribute } from './collapseAttributeWhitespace';
 
 type ValidOptions = 'alphabetical' | 'frequency';
 const validOptions = new Set(['frequency', 'alphabetical']);
@@ -76,9 +76,11 @@ function sortAttributesWithListsInAlphabeticalOrder(tree: PostHTMLTreeLike) {
             return node;
         }
 
+        const tagName = node.tag ? node.tag.toLowerCase() : undefined;
+
         Object.keys(node.attrs).forEach((attrName) => {
             const attrNameLower = attrName.toLowerCase();
-            if (!attributesWithLists.has(attrNameLower)) {
+            if (!isListAttribute(attrNameLower, tagName)) {
                 return;
             }
 
@@ -105,10 +107,12 @@ function sortAttributesWithListsByFrequency(tree: PostHTMLTreeLike) {
             return node;
         }
 
+        const tagName = node.tag ? node.tag.toLowerCase() : undefined;
+
         Object.entries(node.attrs).forEach(([attrName, attrValues]) => {
             const attrNameLower = attrName.toLowerCase();
 
-            if (!attributesWithLists.has(attrNameLower)) {
+            if (!isListAttribute(attrNameLower, tagName)) {
                 return;
             }
 
@@ -125,10 +129,12 @@ function sortAttributesWithListsByFrequency(tree: PostHTMLTreeLike) {
             return node;
         }
 
+        const tagName = node.tag ? node.tag.toLowerCase() : undefined;
+
         Object.entries(node.attrs).forEach(([attrName, attrValues]) => {
             const attrNameLower = attrName.toLowerCase();
 
-            if (!attributesWithLists.has(attrNameLower)) {
+            if (!isListAttribute(attrNameLower, tagName)) {
                 return;
             }
 

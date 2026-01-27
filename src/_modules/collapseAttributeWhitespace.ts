@@ -1,21 +1,36 @@
 import { isEventHandler } from '../helpers';
 import type { HtmlnanoModule } from '../types';
 
-export const attributesWithLists = new Set([
-    'class',
-    'dropzone',
-    'rel', // a, area, link
-    'ping', // a, area
-    'sandbox', // iframe
+export const attributesWithLists = new Map<string, Set<string>>([
+    ['class', new Set()],
+    ['dropzone', new Set()],
+    ['rel', new Set()], // a, area, link
+    ['ping', new Set()], // a, area
+    ['sandbox', new Set()], // iframe
     /**
      * https://github.com/posthtml/htmlnano/issues/180
      * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/link#attr-sizes
      *
-     * "sizes" of <img> should not be modified, while "sizes" of <link> will only have one entry in most cases.
+     * "sizes" of <img> should not be modified, while "sizes" of <link> is a list of tokens.
      */
-    // 'sizes', // link
-    'headers' // td, th
+    ['sizes', new Set(['link'])],
+    ['headers', new Set()] // td, th
 ]);
+
+export function isListAttribute(attrName: string, tagName?: string) {
+    const attrKey = attrName.toLowerCase();
+    const tagSet = attributesWithLists.get(attrKey);
+    if (!tagSet) {
+        return false;
+    }
+    if (tagSet.size === 0) {
+        return true;
+    }
+    if (!tagName) {
+        return false;
+    }
+    return tagSet.has(tagName.toLowerCase());
+}
 
 /** empty set means the attribute is alwasy trimmable */
 const attributesWithSingleValue = new Map<string, Set<string>>([
@@ -74,21 +89,23 @@ const mod: HtmlnanoModule = {
         return (attrs, node) => {
             const newAttrs = attrs;
 
+            const tagName = node.tag ? node.tag.toLowerCase() : undefined;
+
             Object.entries(attrs).forEach(([attrName, attrValue]) => {
                 if (typeof attrValue !== 'string') return;
 
-                if (attributesWithLists.has(attrName)) {
+                const attrNameLower = attrName.toLowerCase();
+
+                if (isListAttribute(attrNameLower, tagName)) {
                     newAttrs[attrName] = attrValue.replace(/\s+/g, ' ').trim();
                     return;
                 }
 
-                if (
-                    isEventHandler(attrName)
-                ) {
+                if (isEventHandler(attrName)) {
                     newAttrs[attrName] = attrValue.trim();
-                } else if (node.tag && attributesWithSingleValue.has(attrName)) {
-                    const tagSet = attributesWithSingleValue.get(attrName)!;
-                    if (tagSet.size === 0 || tagSet.has(node.tag)) {
+                } else if (tagName && attributesWithSingleValue.has(attrNameLower)) {
+                    const tagSet = attributesWithSingleValue.get(attrNameLower)!;
+                    if (tagSet.size === 0 || tagSet.has(tagName)) {
                         newAttrs[attrName] = attrValue.trim();
                     }
                 }
