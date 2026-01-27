@@ -644,6 +644,9 @@ htmlnano.process(html, {
 });
 ```
 
+The module treats script types with parameters (for example `text/javascript; charset=utf-8`) as JavaScript. For
+`type="module"` scripts, it enables Terser's `module` option unless you explicitly set `module` yourself.
+
 
 
 #### Example

@@ -36,9 +36,11 @@ const mod: HtmlnanoModule<MinifyOptions> = {
             }
 
             if (node.tag && node.tag === 'script') {
-                const mimeType = nodeAttrs.type || 'text/javascript';
+                const rawMimeType = normalizeScriptType(nodeAttrs.type);
+                const mimeType = rawMimeType || 'text/javascript';
                 if (redundantScriptTypes.has(mimeType) || mimeType === 'module') {
-                    p = processScriptNode(node, terserOptions, terser);
+                    const scriptTerserOptions = resolveScriptTerserOptions(terserOptions, mimeType);
+                    p = processScriptNode(node, scriptTerserOptions, terser);
                     if (p) {
                         promises.push(p);
                     }
@@ -66,6 +68,34 @@ function stripCdata(js: string) {
 
     const strippedJs = leftStrippedJs.replace(/\/\/\s*\]\]>/, '').replace(/\/\*\s*\]\]>\s*\*\//, '');
     return leftStrippedJs === strippedJs ? js : strippedJs;
+}
+
+function normalizeScriptType(rawType: unknown) {
+    if (typeof rawType !== 'string') {
+        return undefined;
+    }
+
+    const trimmed = rawType.trim();
+    if (!trimmed) {
+        return '';
+    }
+
+    const [mimeType] = trimmed.split(';');
+    return mimeType.trim().toLowerCase();
+}
+
+function resolveScriptTerserOptions(terserOptions: MinifyOptions, mimeType: string) {
+    if (mimeType !== 'module' || terserOptions.module !== undefined) {
+        return terserOptions;
+    }
+
+    return {
+        ...terserOptions,
+        module: true,
+        toplevel: terserOptions.toplevel ?? false,
+        compress: terserOptions.compress ?? false,
+        mangle: terserOptions.mangle ?? false
+    };
 }
 
 function processScriptNode(scriptNode: PostHTML.Node, terserOptions: MinifyOptions, terser: typeof import('terser')) {

@@ -35,6 +35,14 @@ describe('minifyJs', () => {
         );
     });
 
+    it('should minify JS with script type parameters', () => {
+        return init(
+            '<script type="text/javascript; charset=utf-8"> /* test */ var foob = function () {}; </script>',
+            '<script type="text/javascript; charset=utf-8">var foob=function(){};</script>',
+            options
+        );
+    });
+
     it('should not minify JS with <script> + SRI', () => {
         return init(
             `<div>
@@ -60,6 +68,14 @@ describe('minifyJs', () => {
                 let a = (b) => { return b * 5; };
             </script>`,
             '<script>const f=15;let a=t=>5*t;</script>',
+            options
+        );
+    });
+
+    it('should minify module scripts with ES module syntax', () => {
+        return init(
+            '<script type="module">export const foo = 1;</script>',
+            '<script type="module">export const foo=1;</script>',
             options
         );
     });
