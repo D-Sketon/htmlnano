@@ -87,3 +87,4 @@ You can only omit `npm run build` if you haven't changed the main code, only the
 - Presets live in `src/presets/` and list enabled module keys.
 - Add tests in `test/modules/` for new modules.
 - Update docs for new modules or preset changes.
+- Each module should handle only its own related minifications. For example, `mergeScripts` shouldn't care about white spaces between `<script>` tags as they'll be handled by `collapseWhitespaces`.
