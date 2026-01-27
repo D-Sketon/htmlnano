@@ -73,6 +73,26 @@ describe('removeUnusedCss (uncss)', function () {
             }
         );
     });
+
+    it('should preserve CDATA wrappers when removing rules', () => {
+        const cdataHtml = '<div class="b"><style><![CDATA[.b{color:red}.c{color:blue}]]></style></div>';
+
+        return init(
+            cdataHtml,
+            '<div class="b"><style><![CDATA[.b{color:red}]]></style></div>',
+            options
+        );
+    });
+
+    it('should skip non-css style types', () => {
+        const lessHtml = '<style type="text/less">.unused{color:red}</style><div></div>';
+
+        return init(
+            lessHtml,
+            lessHtml,
+            options
+        );
+    });
 });
 
 describe('removeUnusedCss (purgeCSS)', function () {
@@ -143,6 +163,26 @@ describe('removeUnusedCss (purgeCSS)', function () {
         return init(
             tagHtml,
             '<section><style>section{color:red}</style></section><section>hi</section>',
+            options
+        );
+    });
+
+    it('should keep selectors from class names with newlines', () => {
+        const newlineHtml = '<div class="a\nb"><style>.a{color:red}.b{color:blue}.c{color:green}</style></div>';
+
+        return init(
+            newlineHtml,
+            '<div class="a\nb"><style>.a{color:red}.b{color:blue}</style></div>',
+            options
+        );
+    });
+
+    it('should skip non-css style types', () => {
+        const lessHtml = '<style type="text/less">.unused{color:red}</style><div></div>';
+
+        return init(
+            lessHtml,
+            lessHtml,
             options
         );
     });

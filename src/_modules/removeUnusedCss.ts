@@ -12,9 +12,10 @@ const uncssOptions = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- uncss has no types
 function processStyleNodeUnCSS(html: string, styleNode: PostHTML.Node, uncssOptions: object, uncss: any) {
     const css = extractCssFromStyleNode(styleNode)!;
+    const { strippedCss, isCdataWrapped } = stripCdata(css);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- uncss no types
-    return runUncss(html, css, uncssOptions, uncss).then((css) => {
+    return runUncss(html, strippedCss, uncssOptions, uncss).then((css) => {
         // uncss may have left some style tags empty
         if (css.trim().length === 0) {
             // @ts-expect-error -- explicitly remove the tag
@@ -22,7 +23,7 @@ function processStyleNodeUnCSS(html: string, styleNode: PostHTML.Node, uncssOpti
             styleNode.content = [];
             return;
         }
-        styleNode.content = [css];
+        styleNode.content = [wrapCdata(css, isCdataWrapped)];
     });
 }
 
@@ -53,8 +54,8 @@ const purgeFromHtml = function (tree: PostHTMLTreeLike) {
     const selectors: string[] = [];
 
     tree.walk((node) => {
-        const classes = node.attrs && node.attrs.class && node.attrs.class.split(' ') || [];
-        const ids = node.attrs && node.attrs.id && node.attrs.id.split(' ') || [];
+        const classes = getSelectorTokens(node.attrs && node.attrs.class);
+        const ids = getSelectorTokens(node.attrs && node.attrs.id);
         selectors.push(...classes, ...ids);
         if (node.tag) {
             selectors.push(node.tag);
@@ -67,7 +68,8 @@ const purgeFromHtml = function (tree: PostHTMLTreeLike) {
 
 function processStyleNodePurgeCSS(tree: PostHTMLTreeLike, styleNode: PostHTML.Node, purgecssOptions: object, purgecss: typeof import('purgecss'), extractor: () => string[]) {
     const css = extractCssFromStyleNode(styleNode)!;
-    return runPurgecss(tree, css, purgecssOptions, purgecss, extractor)
+    const { strippedCss, isCdataWrapped } = stripCdata(css);
+    return runPurgecss(tree, strippedCss, purgecssOptions, purgecss, extractor)
         .then((css) => {
             if (css.trim().length === 0) {
                 // @ts-expect-error -- explicitly remove the tag
@@ -75,7 +77,7 @@ function processStyleNodePurgeCSS(tree: PostHTMLTreeLike, styleNode: PostHTML.No
                 styleNode.content = [];
                 return;
             }
-            styleNode.content = [css];
+            styleNode.content = [wrapCdata(css, isCdataWrapped)];
         });
 }
 
@@ -110,6 +112,7 @@ function runPurgecss(tree: PostHTMLTreeLike, css: string, userOptions: Partial<P
 
 export interface RemoveUnusedCssOptions {
     tool?: 'purgeCSS' | 'uncss';
+    [key: string]: unknown;
 }
 
 /** Remove unused CSS */
@@ -123,17 +126,21 @@ const mod: HtmlnanoModule<RemoveUnusedCssOptions> = {
         const purgecss = await optionalImport<typeof import('purgecss')>('purgecss');
         const uncss = await optionalImport('uncss');
 
+        const resolvedOptions = resolveUserOptions(userOptions);
+        const tool = resolvedOptions.tool;
+        const toolOptions = stripToolOption(resolvedOptions);
+
         tree.walk((node) => {
-            if (isStyleNode(node)) {
-                if (userOptions.tool === 'purgeCSS') {
+            if (isStyleNode(node) && isCssStyleType(node)) {
+                if (tool === 'purgeCSS') {
                     if (purgecss) {
                         extractor ??= purgeFromHtml(tree);
-                        promises.push(processStyleNodePurgeCSS(tree, node, userOptions, purgecss, extractor));
+                        promises.push(processStyleNodePurgeCSS(tree, node, toolOptions, purgecss, extractor));
                     }
                 } else {
                     if (uncss) {
                         html ??= tree.render(tree);
-                        promises.push(processStyleNodeUnCSS(html, node, userOptions, uncss));
+                        promises.push(processStyleNodeUnCSS(html, node, toolOptions, uncss));
                     }
                 }
             }
@@ -145,3 +152,60 @@ const mod: HtmlnanoModule<RemoveUnusedCssOptions> = {
 };
 
 export default mod;
+
+const cdataStart = '<![CDATA[';
+const cdataEnd = ']]>';
+
+function stripCdata(css: string) {
+    const trimmed = css.trim();
+    if (!trimmed.startsWith(cdataStart) || !trimmed.endsWith(cdataEnd)) {
+        return { strippedCss: css, isCdataWrapped: false };
+    }
+
+    const strippedCss = trimmed.slice(cdataStart.length, trimmed.length - cdataEnd.length);
+    return { strippedCss, isCdataWrapped: true };
+}
+
+function wrapCdata(css: string, isCdataWrapped: boolean) {
+    if (!isCdataWrapped) {
+        return css;
+    }
+    return `${cdataStart}${css}${cdataEnd}`;
+}
+
+function getSelectorTokens(value: unknown) {
+    if (typeof value !== 'string') {
+        return [];
+    }
+    return value.split(/\s+/).filter(Boolean);
+}
+
+function isCssStyleType(node: PostHTML.Node) {
+    if (!node.attrs || !('type' in node.attrs)) {
+        return true;
+    }
+
+    const rawType = node.attrs.type;
+    if (rawType === '') {
+        return true;
+    }
+
+    if (typeof rawType !== 'string') {
+        return false;
+    }
+
+    const normalizedType = rawType.trim().toLowerCase();
+    return /^text\/css(?:$|\s*;)/.test(normalizedType);
+}
+
+function resolveUserOptions(userOptions: RemoveUnusedCssOptions | true | null | undefined) {
+    if (userOptions && typeof userOptions === 'object') {
+        return userOptions;
+    }
+    return {};
+}
+
+function stripToolOption(options: RemoveUnusedCssOptions) {
+    const { tool: _tool, ...rest } = options;
+    return rest;
+}

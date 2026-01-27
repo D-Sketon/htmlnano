@@ -823,6 +823,11 @@ The following PurgeCSS options are ignored if passed to the module:
 -   `css`
 -   `extractors`
 
+#### Notes
+
+- Only `<style>` tags with a CSS type (`text/css` or no `type` attribute) are processed. Other style types are left untouched.
+- CDATA wrappers in `<style>` tags are preserved after removing unused rules.
+
 #### Example
 Source:
 ```html
