@@ -31,8 +31,12 @@ Follow the notes below to run builds/tests and match the existing style.
 ## Run a Single Test
 Use mocha directly so you can target a file or grep a test name.
 ```
-npx mocha --timeout 5000 --require @swc-node/register --recursive --check-leaks --globals addresses "test/modules/minifyCss.ts"
+npm run build && npx mocha --timeout 5000 --require @swc-node/register --recursive --check-leaks --globals addresses "test/modules/minifyCss.ts"
 ```
+
+It's IMPORTANT to run `npm run build` first, because the tests use the code from `dist/`.
+If you don't do that, you'll be testing outdated code.
+You can only omit `npm run build` it if you haven't changed the main code, only the tests.
 
 
 ## Docs Site Commands (in `docs/`)
