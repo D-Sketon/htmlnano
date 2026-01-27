@@ -43,6 +43,7 @@ describe('sortAttributes', () => {
         const input = '<input type="text" class="form-control" name="testInput" autofocus="" autocomplete="off" id="testId">';
 
         return init(input, input, {
+            // @ts-expect-error invalid configuration
             sortAttributes: 100
         });
     });

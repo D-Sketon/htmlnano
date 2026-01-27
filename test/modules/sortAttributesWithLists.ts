@@ -69,6 +69,7 @@ describe('sortAttributesWithLists', () => {
             input,
             input,
             {
+                // @ts-expect-error invalid type
                 sortAttributesWithLists: 100
             }
         );
