@@ -25,10 +25,26 @@ describe('removeComments', () => {
             );
         });
 
+        it('should not remove <!-- noindex --> with casing/spacing variations', () => {
+            return init(
+                '<!-- NoIndex -->this text will not be indexed<!-- /NoIndex -->',
+                '<!-- NoIndex -->this text will not be indexed<!-- /NoIndex -->',
+                options
+            );
+        });
+
         it('should not remove <!--sse--> and <!--/sse-->', () => {
             return init(
                 '<!--sse-->Bad visitors won\'t see my phone number, 555-555-5555<!--/sse-->',
                 '<!--sse-->Bad visitors won\'t see my phone number, 555-555-5555<!--/sse-->',
+                options
+            );
+        });
+
+        it('should not remove <!-- sse --> with casing/spacing variations', () => {
+            return init(
+                '<!-- SSe -->Bad visitors won\'t see my phone number, 555-555-5555<!-- /SSE -->',
+                '<!-- SSe -->Bad visitors won\'t see my phone number, 555-555-5555<!-- /SSE -->',
                 options
             );
         });
@@ -65,6 +81,14 @@ describe('removeComments', () => {
             );
         });
 
+        it('should not remove excerpt comments with extra text', () => {
+            return init(
+                'Lorem ipsum <!-- more Read more --> dolor sit amet',
+                'Lorem ipsum <!-- more Read more --> dolor sit amet',
+                options
+            );
+        });
+
         // https://github.com/posthtml/htmlnano/issues/137
         it('issue #137', () => {
             return init(
@@ -83,6 +107,14 @@ describe('removeComments', () => {
         it('should remove <!--noindex--> and <!--/noindex-->', () => {
             return init(
                 '<!--noindex-->this text will not be indexed<!--/noindex-->',
+                'this text will not be indexed',
+                options
+            );
+        });
+
+        it('should remove <!-- noindex --> with casing/spacing variations', () => {
+            return init(
+                '<!-- NoIndex -->this text will not be indexed<!-- /NoIndex -->',
                 'this text will not be indexed',
                 options
             );

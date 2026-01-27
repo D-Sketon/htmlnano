@@ -375,7 +375,7 @@ Collapses redundant white spaces (including new lines). It doesn’t affect whit
 
 ### removeComments
 #### Options
-- `safe` – removes all HTML comments except the conditional comments and  [`<!--noindex--><!--/noindex-->`](https://yandex.com/support/webmaster/controlling-robot/html.xml) (default)
+- `safe` – removes all HTML comments except conditional comments, [`<!--noindex--><!--/noindex-->`](https://yandex.com/support/webmaster/controlling-robot/html.xml), `<!--sse--><!--/sse-->`, and excerpt comments like `<!-- more -->` or `<!-- more Read more -->` (case/spacing tolerant) (default)
 - `all` — removes all HTML comments
 - A `RegExp` — only HTML comments matching the given regexp will be removed.
 - A `Function` that returns boolean — removes HTML comments that can make the given callback function returns truthy value.

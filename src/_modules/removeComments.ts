@@ -1,7 +1,9 @@
 import { isComment, isConditionalComment } from '../helpers';
 import type { HtmlnanoModule, PostHTMLNodeLike } from '../types';
 
-const MATCH_EXCERPT_REGEXP = /<!-- ?more ?-->/i;
+const MATCH_EXCERPT_REGEXP = /^\s*more\b/i;
+const MATCH_NOINDEX_REGEXP = /^\s*\/?\s*noindex\s*$/i;
+const MATCH_SSE_REGEXP = /^\s*\/?\s*sse\s*$/i;
 
 export type RemoveCommentsOptions = boolean | 'safe' | 'all' | RegExp | ((comment: string) => boolean);
 
@@ -41,14 +43,15 @@ function isCommentToRemove(text: PostHTMLNodeLike, removeType: Partial<RemoveCom
     }
 
     if (removeType === 'safe') {
-        const isNoindex = text === '<!--noindex-->' || text === '<!--/noindex-->';
+        const commentBody = getCommentBody(text);
+        const isNoindex = commentBody ? MATCH_NOINDEX_REGEXP.test(commentBody) : false;
         // Don't remove noindex comments.
         // See: https://yandex.com/support/webmaster/controlling-robot/html.xml
         if (isNoindex) {
             return false;
         }
 
-        const isServerSideExclude = text === '<!--sse-->' || text === '<!--/sse-->';
+        const isServerSideExclude = commentBody ? MATCH_SSE_REGEXP.test(commentBody) : false;
         // Don't remove sse comments.
         // See: https://support.cloudflare.com/hc/en-us/articles/200170036-What-does-Server-Side-Excludes-SSE-do-
         if (isServerSideExclude) {
@@ -64,7 +67,7 @@ function isCommentToRemove(text: PostHTMLNodeLike, removeType: Partial<RemoveCom
         // Hugo: https://gohugo.io/content-management/summaries/#manual-summary-splitting
         // WordPress: https://wordpress.com/support/wordpress-editor/blocks/more-block/2/
         // Jekyll: https://jekyllrb.com/docs/posts/#post-excerpts
-        const isCMSExcerptComment = MATCH_EXCERPT_REGEXP.test(text);
+        const isCMSExcerptComment = commentBody ? MATCH_EXCERPT_REGEXP.test(commentBody) : false;
         if (isCMSExcerptComment) {
             return false;
         }
@@ -96,4 +99,13 @@ function isMatcher(matcher: Partial<RemoveCommentsOptions>) {
     }
 
     return false;
+}
+
+function getCommentBody(text: string): string | null {
+    const trimmed = text.trim();
+    const match = trimmed.match(/^<!--([\s\S]*?)-->$/);
+    if (!match) {
+        return null;
+    }
+    return match[1];
 }
