@@ -2,6 +2,73 @@ import type PostHTML from 'posthtml';
 import { extractTextContentFromNode, isAmpBoilerplate } from '../helpers';
 import type { HtmlnanoModule } from '../types';
 
+const booleanAttrs = new Set(['amp-custom', 'disabled']);
+
+function normalizeStyleType(attrs: PostHTML.NodeAttributes) {
+    if (!attrs || typeof attrs.type !== 'string') {
+        return 'text/css';
+    }
+
+    const type = attrs.type.trim();
+    return type ? type.toLowerCase() : 'text/css';
+}
+
+function normalizeStyleMedia(attrs: PostHTML.NodeAttributes) {
+    if (!attrs || typeof attrs.media !== 'string') {
+        return 'all';
+    }
+
+    const media = attrs.media.trim();
+    return media ? media.replace(/\s+/g, ' ').toLowerCase() : 'all';
+}
+
+function normalizeStyleAttrsForKey(attrs: PostHTML.NodeAttributes) {
+    const normalized: Record<string, string | boolean> = {};
+
+    for (const [key, value] of Object.entries(attrs || {})) {
+        if (key === 'type' || key === 'media') {
+            continue;
+        }
+
+        if (value === undefined) {
+            continue;
+        }
+
+        if (booleanAttrs.has(key)) {
+            normalized[key] = true;
+            continue;
+        }
+
+        normalized[key] = value as string | boolean;
+    }
+
+    return normalized;
+}
+
+function buildStyleKey(attrs: PostHTML.NodeAttributes) {
+    const keyObject: Record<string, string | boolean> = {
+        type: normalizeStyleType(attrs),
+        media: normalizeStyleMedia(attrs),
+        ...normalizeStyleAttrsForKey(attrs)
+    };
+    const sortedKeys = Object.keys(keyObject).sort();
+    const sortedKeyObject: Record<string, string | boolean> = {};
+
+    for (const key of sortedKeys) {
+        sortedKeyObject[key] = keyObject[key];
+    }
+
+    return JSON.stringify(sortedKeyObject);
+}
+
+function extractStyleTextContent(node: PostHTML.Node) {
+    if (typeof node.content === 'string') {
+        return node.content;
+    }
+
+    return extractTextContentFromNode(node);
+}
+
 /* Merge multiple <style> into one */
 const mod: HtmlnanoModule = {
     default(tree) {
@@ -23,11 +90,9 @@ const mod: HtmlnanoModule = {
                 return node;
             }
 
-            const styleType = nodeAttrs.type || 'text/css';
-            const styleMedia = nodeAttrs.media || 'all';
-            const styleKey = styleType + '_' + styleMedia;
+            const styleKey = buildStyleKey(nodeAttrs);
             if (styleKey in styleNodes) {
-                const styleContent = extractTextContentFromNode(node);
+                const styleContent = extractStyleTextContent(node);
 
                 styleNodes[styleKey].content ??= [];
                 styleNodes[styleKey].content.push(' ' + styleContent);

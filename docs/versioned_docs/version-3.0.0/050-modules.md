@@ -519,8 +519,9 @@ posthtml([
 
 ## `<style>`, `<script>` and `<svg>` Tags
 ### mergeStyles
-Merges multiple `<style>` with the same `media` and `type` into one tag.
-`<style scoped>...</style>` are skipped.
+Merges multiple `<style>` with the same `media` and `type` into one tag, as long as all
+other attributes match (for example: `nonce`, `amp-custom`, `title`, `data-*`).
+`<style scoped>...</style>` and `<style integrity>...</style>` are skipped.
 
 #### Example
 Source:

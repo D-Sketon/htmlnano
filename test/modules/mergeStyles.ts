@@ -51,6 +51,41 @@ describe('mergeStyles', () => {
         );
     });
 
+    it('should merge styles with equivalent media spacing', () => {
+        return init(
+            '<style media="screen and (min-width: 600px)">h1 { color: red }</style>'
+            + '<style media="screen   and (min-width: 600px)">div { color: blue }</style>',
+
+            '<style media="screen and (min-width: 600px)">h1 { color: red } div { color: blue }</style>',
+
+            options
+        );
+    });
+
+    it('should not merge styles with different nonce values', () => {
+        return init(
+            '<style nonce="abc">h1 { color: red }</style>'
+            + '<style>div { color: blue }</style>',
+
+            '<style nonce="abc">h1 { color: red }</style>'
+            + '<style>div { color: blue }</style>',
+
+            options
+        );
+    });
+
+    it('should not merge amp-custom and non-amp-custom styles', () => {
+        return init(
+            '<style amp-custom>h1 { color: red }</style>'
+            + '<style>div { color: blue }</style>',
+
+            '<style amp-custom="">h1 { color: red }</style>'
+            + '<style>div { color: blue }</style>',
+
+            options
+        );
+    });
+
     it('should preserve amp-custom', () => {
         return init(
             '<style amp-custom>h1 { color: red }</style>'
