@@ -1,3 +1,4 @@
+import { expect } from 'expect';
 import { init } from '../htmlnano.ts';
 import safePreset from '../../dist/presets/safe.mjs';
 import maxPreset from '../../dist/presets/max.mjs';
@@ -125,5 +126,64 @@ describe('minifySvg', () => {
                 minifySvg: {}
             }
         );
+    });
+
+    it('should return original svg and report non-parser errors', async () => {
+        const input = '<svg xmlns="http://www.w3.org/2000/svg"><path d=""/></svg>';
+        const originalConsoleError = console.error;
+        let errorCalls = 0;
+        console.error = () => {
+            errorCalls += 1;
+        };
+
+        try {
+            await init(
+                input,
+                input,
+                {
+                    minifySvg: {
+                        plugins: [
+                            {
+                                name: 'nonexistent-plugin'
+                            }
+                        ]
+                    } as SvgoConfig
+                }
+            );
+        } finally {
+            console.error = originalConsoleError;
+        }
+
+        expect(errorCalls).toBe(2);
+    });
+
+    it('should skip svg error reporting when skipInternalWarnings is true', async () => {
+        const input = '<svg xmlns="http://www.w3.org/2000/svg"><path d=""/></svg>';
+        const originalConsoleError = console.error;
+        let errorCalls = 0;
+        console.error = () => {
+            errorCalls += 1;
+        };
+
+        try {
+            await init(
+                input,
+                input,
+                {
+                    skipInternalWarnings: true,
+                    minifySvg: {
+                        plugins: [
+                            {
+                                name: 'nonexistent-plugin'
+                            }
+                        ]
+                    } as SvgoConfig
+                }
+            );
+        } finally {
+            console.error = originalConsoleError;
+        }
+
+        expect(errorCalls).toBe(0);
     });
 });

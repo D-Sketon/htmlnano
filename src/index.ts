@@ -150,7 +150,12 @@ const htmlnano = Object.assign(function htmlnano(optionsRun: HtmlnanoOptions = {
         options = { ...preset, ...options };
         let promise = Promise.resolve(tree);
 
+        const nonModuleOptions = new Set(['skipInternalWarnings']);
+
         for (const [moduleName, moduleOptions] of Object.entries(options)) {
+            if (nonModuleOptions.has(moduleName)) {
+                continue;
+            }
             if (!moduleOptions) {
                 // The module is disabled
                 continue;
