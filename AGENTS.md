@@ -62,6 +62,7 @@ You can only omit `npm run build` if you haven't changed the main code, only the
 - `camelCase` for variables/properties (ESLint `camelcase` enforced).
 - Use clear, descriptive module names that match preset keys.
 - File names are lowercase with optional dashes or camel case.
+- Use named function instead of constants (e.g., `function foob() { }` instead of `const foob = () => {}`).
 
 ### Types and TS Config
 - `strict` and `strictNullChecks` are enabled.
