@@ -231,6 +231,13 @@ describe('removeOptionalTags', () => {
 
             return init(input, input, options);
         });
+
+        it('<colgroup> preceded by <colgroup>', () => {
+            const input = '<colgroup><col></colgroup><colgroup><col></colgroup>';
+            const expected = '<col><colgroup><col></colgroup>';
+
+            return init(input, expected, options);
+        });
     });
 
     context('omit optional <tbody>', () => {

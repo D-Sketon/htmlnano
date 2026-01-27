@@ -4,6 +4,8 @@ import type { HtmlnanoModule, PostHTMLNodeLike, PostHTMLTreeLike } from '../type
 
 const startWithWhitespacePattern = /^\s+/;
 
+type OptionalTagNode = PostHTML.Node & { optionalTagName?: string };
+
 const bodyStartTagCantBeOmittedWithFirstChildTags = new Set(['meta', 'link', 'script', 'style']);
 const tbodyStartTagCantBeOmittedWithPrecededTags = new Set(['tbody', 'thead', 'tfoot']);
 const tbodyEndTagCantBeOmittedWithFollowedTags = new Set(['tbody', 'tfoot']);
@@ -71,6 +73,19 @@ function getNextNode(tree: PostHTMLTreeLike | PostHTMLNodeLike[], currentNodeInd
     return null;
 }
 
+function omitTag(node: PostHTML.Node) {
+    const optionalTagNode = node as OptionalTagNode;
+    optionalTagNode.optionalTagName = typeof node.tag === 'string' ? node.tag : undefined;
+    // @ts-expect-error -- deliberately set tag to false
+    node.tag = false;
+}
+
+function getNodeTagName(node: PostHTML.Node) {
+    if (node.tag) return node.tag;
+    const optionalTagNode = node as OptionalTagNode;
+    return optionalTagNode.optionalTagName || false;
+}
+
 function removeOptionalTags(tree: PostHTMLTreeLike): PostHTMLTreeLike;
 function removeOptionalTags(tree: PostHTMLNodeLike[]): PostHTMLNodeLike[];
 function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
@@ -104,8 +119,7 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
             }
 
             if (isHtmlStartTagCanBeOmitted && isHtmlEndTagCanBeOmitted) {
-                // @ts-expect-error -- deliberately set tag to false
-                node.tag = false;
+                omitTag(node);
             }
         }
 
@@ -132,8 +146,7 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
             }
 
             if (isHeadStartTagCanBeOmitted && isHeadEndTagCanBeOmitted) {
-                // @ts-expect-error -- deliberately set tag to false
-                node.tag = false;
+                omitTag(node);
             }
         }
 
@@ -161,8 +174,7 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
             }
 
             if (isBodyStartTagCanBeOmitted && isBodyEndTagCanBeOmitted) {
-                // @ts-expect-error -- deliberately set tag to false
-                node.tag = false;
+                omitTag(node);
             }
         }
 
@@ -178,7 +190,7 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
                 isColgroupStartTagCanBeOmitted = true;
             }
 
-            if (prevNonEmptyNode && typeof prevNonEmptyNode === 'object' && prevNonEmptyNode.tag && prevNonEmptyNode.tag === 'colgroup') {
+            if (prevNonEmptyNode && typeof prevNonEmptyNode === 'object' && getNodeTagName(prevNonEmptyNode) === 'colgroup') {
                 isColgroupStartTagCanBeOmitted = false;
             }
 
@@ -190,8 +202,7 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
             }
 
             if (isColgroupStartTagCanBeOmitted && isColgroupEndTagCanBeOmitted) {
-                // @ts-expect-error -- deliberately set tag to false
-                node.tag = false;
+                omitTag(node);
             }
         }
 
@@ -207,17 +218,22 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
                 isTbodyStartTagCanBeOmitted = true;
             }
 
-            if (prevNonEmptyNode && typeof prevNonEmptyNode === 'object' && prevNonEmptyNode.tag && tbodyStartTagCantBeOmittedWithPrecededTags.has(prevNonEmptyNode.tag)) {
-                isTbodyStartTagCanBeOmitted = false;
+            if (prevNonEmptyNode && typeof prevNonEmptyNode === 'object') {
+                const prevTagName = getNodeTagName(prevNonEmptyNode);
+                if (prevTagName && tbodyStartTagCantBeOmittedWithPrecededTags.has(prevTagName)) {
+                    isTbodyStartTagCanBeOmitted = false;
+                }
             }
 
-            if (nextNonEmptyNode && typeof nextNonEmptyNode === 'object' && nextNonEmptyNode.tag && tbodyEndTagCantBeOmittedWithFollowedTags.has(nextNonEmptyNode.tag)) {
-                isTbodyEndTagCanBeOmitted = false;
+            if (nextNonEmptyNode && typeof nextNonEmptyNode === 'object') {
+                const nextTagName = getNodeTagName(nextNonEmptyNode);
+                if (nextTagName && tbodyEndTagCantBeOmittedWithFollowedTags.has(nextTagName)) {
+                    isTbodyEndTagCanBeOmitted = false;
+                }
             }
 
             if (isTbodyStartTagCanBeOmitted && isTbodyEndTagCanBeOmitted) {
-                // @ts-expect-error -- deliberately set tag to false
-                node.tag = false;
+                omitTag(node);
             }
         }
 
