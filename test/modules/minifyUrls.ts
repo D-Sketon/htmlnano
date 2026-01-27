@@ -115,6 +115,24 @@ describe('minifyUrls', () => {
         );
     });
 
+    it('should minify javascript url with leading whitespace', () => {
+        return init(
+            '<img src="  JaVaScRiPt:alert(true)">',
+            '<img src="  javascript:alert(!0)">',
+            { ...safePreset, collapseAttributeWhitespace: false, minifyUrls: 'https://example.com/foo/baz/' }
+        );
+    });
+
+    it('should skip non-http schemes', () => {
+        const html = '<a href="mailto:user@example.com">mail</a><a href="tel:+123">tel</a><a href="data:text/plain,hi">data</a>';
+        return init(html, html, { ...safePreset, minifyUrls: 'https://example.com/' });
+    });
+
+    it('should skip hash and query only urls', () => {
+        const html = '<a href="#section">hash</a><a href="?foo=bar">query</a>';
+        return init(html, html, { ...safePreset, minifyUrls: 'https://example.com/' });
+    });
+
     it('should process link imagesrcset', () => {
         return init(
             '<link rel="preload" imagesrcset="https://example.com/foo/bar.png 1x, https://example.com/foo/baz.png 2x">',

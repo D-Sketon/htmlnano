@@ -194,6 +194,12 @@ htmlnano.process(html, {
 });
 ```
 
+#### Notes
+
+- Only `http(s)` and relative URLs are related. Non-HTTP schemes (e.g. `mailto:`, `tel:`, `data:`) are left untouched.
+- Hash-only (`#...`) and query-only (`?...`) URLs are left untouched.
+- `javascript:` URLs are minified with `terser` when available.
+
 #### Example
 
 **Basic Usage**

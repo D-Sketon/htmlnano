@@ -1,8 +1,7 @@
 import type RelateUrl from 'relateurl';
-import { optionalImport } from '../helpers';
-import type { HtmlnanoModule } from '../types';
 import type PostHTML from 'posthtml';
-import type { Options as SrcsetOptions } from 'srcset';
+import { optionalImport } from '../helpers';
+import type { HtmlnanoModule, HtmlnanoOptions } from '../types';
 
 // Adopts from https://github.com/kangax/html-minifier/blob/51ce10f4daedb1de483ffbcccecc41be1c873da2/src/htmlminifier.js#L209-L221
 const tagsHaveUriValuesForAttributes = new Set([
@@ -94,7 +93,9 @@ const isSrcsetAttribute = (tag: string, attr: string) => {
     );
 };
 
-const processModuleOptions = (options: SrcsetOptions) => {
+type MinifyUrlsOptions = HtmlnanoOptions['minifyUrls'] | Partial<URL> | undefined;
+
+const processModuleOptions = (options: MinifyUrlsOptions) => {
     // FIXME!
     // relateurl@1.0.0-alpha only supports URL while stable version (0.2.7) only supports string
     // should convert input into URL instance after relateurl@1 is stable
@@ -121,8 +122,8 @@ let relateUrlInstance: RelateUrl;
 let STORED_URL_BASE: string;
 
 /** Convert absolute url into relative url */
-const mod: HtmlnanoModule = {
-    async default(tree, options, moduleOptions: SrcsetOptions) {
+const mod: HtmlnanoModule<HtmlnanoOptions['minifyUrls']> = {
+    async default(tree, options, moduleOptions) {
         const RelateUrl = await optionalImport<typeof import('relateurl')>('relateurl');
         const srcset = await optionalImport<typeof import('srcset')>('srcset');
         const terser = await optionalImport<typeof import('terser')>('terser');
@@ -162,32 +163,30 @@ const mod: HtmlnanoModule = {
                 const attrNameLower = attrName.toLowerCase();
 
                 if (isUriTypeAttribute(node.tag, attrNameLower)) {
-                    if (isJavaScriptUrl(attrValue)) {
-                        promises.push(minifyJavaScriptUrl(node, attrName, terser));
-                    } else {
-                        if (relateUrlInstance && attrValue) {
-                        // FIXME!
-                        // relateurl@1.0.0-alpha only supports URL while stable version (0.2.7) only supports string
-                        // the WHATWG URL API is very strict while attrValue might not be a valid URL
-                        // new URL should be used, and relateUrl#relate should be wrapped in try...catch after relateurl@1 is stable
+                    if (typeof attrValue !== 'string') continue;
 
-                            node.attrs[attrName] = relateUrlInstance.relate(attrValue);
-                        }
+                    const javascriptMatch = getJavaScriptUrlMatch(attrValue);
+                    if (javascriptMatch) {
+                        promises.push(minifyJavaScriptUrl(node, attrName, javascriptMatch, terser));
+                        continue;
+                    }
+
+                    if (relateUrlInstance) {
+                        node.attrs[attrName] = relateUrlValue(relateUrlInstance, attrValue);
                     }
 
                     continue;
                 }
 
                 if (isSrcsetAttribute(node.tag, attrNameLower)) {
-                    if (srcset && attrValue) {
+                    if (srcset && typeof attrValue === 'string') {
                         try {
                             const parsedSrcset = srcset.parseSrcset(attrValue, { strict: true });
 
                             node.attrs[attrName] = srcset.stringifySrcset(parsedSrcset.map((item) => {
                                 if (relateUrlInstance) {
                                     // @ts-expect-error -- not actually readonly
-
-                                    item.url = relateUrlInstance.relate(item.url);
+                                    item.url = relateUrlValue(relateUrlInstance, item.url);
                                 }
 
                                 return item;
@@ -211,30 +210,76 @@ const mod: HtmlnanoModule = {
 
 export default mod;
 
-function isJavaScriptUrl(url: unknown) {
-    return typeof url === 'string' && url.toLowerCase().startsWith(JAVASCRIPT_URL_PROTOCOL);
-}
+type JavaScriptUrlMatch = {
+    leadingWhitespace: string;
+    code: string;
+};
 
 const jsWrapperStart = 'function a(){';
 const jsWrapperEnd = '}a();';
+const javascriptUrlRegex = /^(\s*)(javascript:)([\s\S]*)$/i;
 
-function minifyJavaScriptUrl(node: PostHTML.Node, attrName: string, terser: typeof import('terser') | null) {
+function getJavaScriptUrlMatch(url: string): JavaScriptUrlMatch | null {
+    const match = javascriptUrlRegex.exec(url);
+    if (!match) return null;
+
+    return {
+        leadingWhitespace: match[1],
+        code: match[3]
+    };
+}
+
+function getUrlScheme(value: string) {
+    const match = /^[a-z][a-z0-9+.-]*:/i.exec(value);
+    if (!match) return null;
+
+    return match[0].slice(0, -1).toLowerCase();
+}
+
+function shouldRelateUrlValue(value: string) {
+    const trimmed = value.trim();
+    if (!trimmed) return false;
+    if (trimmed.startsWith('#') || trimmed.startsWith('?')) return false;
+
+    const scheme = getUrlScheme(trimmed);
+    if (scheme) return scheme === 'http' || scheme === 'https';
+
+    return true;
+}
+
+function relateUrlValue(relateUrl: RelateUrl, value: string) {
+    if (!shouldRelateUrlValue(value)) return value;
+
+    // FIXME!
+    // relateurl@1.0.0-alpha only supports URL while stable version (0.2.7) only supports string
+    // the WHATWG URL API is very strict while attrValue might not be a valid URL
+    // new URL should be used, and relateUrl#relate should be wrapped in try...catch after relateurl@1 is stable
+    try {
+        return relateUrl.relate(value);
+    } catch {
+        return value;
+    }
+}
+
+function minifyJavaScriptUrl(
+    node: PostHTML.Node,
+    attrName: string,
+    match: JavaScriptUrlMatch,
+    terser: typeof import('terser') | null
+) {
     if (!terser) return Promise.resolve();
 
-    let result = node.attrs?.[attrName];
-    if (result) {
-        result = jsWrapperStart + result.slice(JAVASCRIPT_URL_PROTOCOL.length) + jsWrapperEnd;
+    const result = jsWrapperStart + match.code + jsWrapperEnd;
 
-        return terser
-            .minify(result, {}) // Default Option is good enough
-            .then(({ code }) => {
-                const minifiedJs = code!.substring(
-                    jsWrapperStart.length,
-                    code!.length - jsWrapperEnd.length
-                );
-                node.attrs![attrName] = JAVASCRIPT_URL_PROTOCOL + minifiedJs;
-            });
-    }
-
-    return Promise.resolve();
+    return terser
+        .minify(result, {}) // Default Option is good enough
+        .then(({ code }) => {
+            if (!code) return;
+            const minifiedJs = code.substring(
+                jsWrapperStart.length,
+                code.length - jsWrapperEnd.length
+            );
+            node.attrs![attrName] = match.leadingWhitespace + JAVASCRIPT_URL_PROTOCOL + minifiedJs;
+        })
+        .catch(() => undefined);
 }
