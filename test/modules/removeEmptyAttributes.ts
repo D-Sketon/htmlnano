@@ -45,4 +45,12 @@ describe('removeEmptyAttributes', () => {
             options
         );
     });
+
+    it('should remove empty minlength and maxlength on supported tags', () => {
+        return init(
+            '<input minlength="" maxlength=" "><textarea minlength="\t" maxlength=""></textarea>',
+            '<input><textarea></textarea>',
+            options
+        );
+    });
 });

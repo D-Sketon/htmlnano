@@ -1,7 +1,7 @@
 import { isEventHandler } from '../helpers';
 import type { HtmlnanoModule } from '../types';
 
-const safeToRemoveAttrs: Record<string, string | null | string[]> = {
+const safeToRemoveAttrs: Record<string, string[] | null> = {
     id: null,
     class: null,
     style: null,
@@ -31,16 +31,16 @@ const safeToRemoveAttrs: Record<string, string | null | string[]> = {
     ],
     formaction: ['button', 'input'],
     height: ['canvas', 'embed', 'iframe', 'img', 'input', 'object', 'video'],
-    high: 'meter',
-    href: 'link',
-    list: 'input',
-    low: 'meter',
-    manifest: 'html',
+    high: ['meter'],
+    href: ['link'],
+    list: ['input'],
+    low: ['meter'],
+    manifest: ['html'],
     max: ['meter', 'progress'],
-    maxLength: ['input', 'textarea'],
-    menu: 'button',
-    min: 'meter',
-    minLength: ['input', 'textarea'],
+    maxlength: ['input', 'textarea'],
+    menu: ['button'],
+    min: ['meter'],
+    minlength: ['input', 'textarea'],
     name: [
         'button',
         'fieldset',
@@ -60,7 +60,7 @@ const safeToRemoveAttrs: Record<string, string | null | string[]> = {
     placeholder: ['input', 'textarea'],
     poster: ['video'],
     rel: ['a', 'area', 'link'],
-    rows: 'textarea',
+    rows: ['textarea'],
     rowspan: ['td', 'th'],
     size: ['input', 'select'],
     span: ['col', 'colgroup'],
@@ -75,7 +75,7 @@ const safeToRemoveAttrs: Record<string, string | null | string[]> = {
         'track',
         'video'
     ],
-    start: 'ol',
+    start: ['ol'],
     tabindex: null,
     type: [
         'a',
@@ -99,21 +99,21 @@ const mod: HtmlnanoModule = {
     onAttrs() {
         return (attrs, node) => {
             const newAttrs = { ...attrs };
+            const tagName = typeof node.tag === 'string' ? node.tag.toLowerCase() : '';
             Object.entries(attrs).forEach(([attrName, attrValue]) => {
+                const normalizedAttrName = attrName.toLowerCase();
+                const safeAttr = safeToRemoveAttrs[normalizedAttrName];
                 if (
                     isEventHandler(attrName)
                     || (
-                        Object.hasOwnProperty.call(safeToRemoveAttrs, attrName)
-                        && (
-                            safeToRemoveAttrs[attrName] === null
-                            || (typeof node.tag === 'string' && safeToRemoveAttrs[attrName].includes(node.tag))
-                        )
+                        safeAttr !== undefined
+                        && (safeAttr === null || (tagName && safeAttr.includes(tagName)))
                     )
                 ) {
-                    if (typeof attrValue === 'string') {
-                        if (attrValue === '' || attrValue.trim() === '') {
-                            delete newAttrs[attrName];
-                        }
+                    if (attrValue === null || attrValue === undefined) {
+                        delete newAttrs[attrName];
+                    } else if (typeof attrValue === 'string' && attrValue.trim() === '') {
+                        delete newAttrs[attrName];
                     }
                 }
             });
