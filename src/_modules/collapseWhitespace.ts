@@ -6,7 +6,8 @@ const noWhitespaceCollapseElements = new Set([
     'script',
     'style',
     'pre',
-    'textarea'
+    'textarea',
+    'template'
 ]);
 
 const noTrimWhitespacesArroundElements = new Set([
@@ -18,7 +19,7 @@ const noTrimWhitespacesArroundElements = new Set([
 
 const noTrimWhitespacesInsideElements = new Set([
     // non-empty tags that will maintain whitespace within them
-    'a', 'abbr', 'acronym', 'b', 'big', 'del', 'em', 'font', 'i', 'ins', 'kbd', 'mark', 'nobr', 'rp', 's', 'samp', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'time', 'tt', 'u', 'var'
+    'a', 'abbr', 'acronym', 'b', 'bdi', 'bdo', 'big', 'cite', 'code', 'del', 'dfn', 'em', 'font', 'i', 'ins', 'kbd', 'label', 'mark', 'nobr', 'q', 'rp', 'rt', 'rtc', 'ruby', 's', 'samp', 'small', 'span', 'strike', 'strong', 'sub', 'sup', 'time', 'tt', 'u', 'var'
 ]);
 
 const startsWithWhitespacePattern = /^\s/;
@@ -94,6 +95,16 @@ function collapseRedundantWhitespaces(
         }
 
         if (
+            collapseType === 'aggressive'
+            && text.trim().length === 0
+            && (isTrimmableAroundNode(prevNode) || prevNode == null)
+            && (isTrimmableAroundNode(nextNode) || nextNode == null)
+            && !(isCommentNode(prevNode) && isCommentNode(nextNode))
+        ) {
+            return NONE;
+        }
+
+        if (
             typeof parent !== 'object'
             || !parent?.node.tag
             || !noTrimWhitespacesInsideElements.has(parent.node.tag)
@@ -141,7 +152,7 @@ function collapseRedundantWhitespaces(
                 !prevNode // it the textnode is the first child of the node
                 && startsWithWhitespacePattern.test(text[0]) // it starts with white space
                 && typeof parent?.prevNode === 'string' // the prev of the node is a textNode as well
-                && endsWithWhitespacePattern.test(parent.prevNode[parent.prevNode.length - 1]) // that prev is ends with a white
+                && endsWithWhitespacePattern.test(parent.prevNode[parent.prevNode.length - 1] ?? '') // that prev is ends with a white
             ) {
                 text = text.trimStart();
             }
@@ -149,6 +160,16 @@ function collapseRedundantWhitespaces(
     }
 
     return text;
+}
+
+function isTrimmableAroundNode(node: PostHTML.Node | string | undefined) {
+    if (!node) return true;
+    if (typeof node === 'string') return isComment(node);
+    return typeof node.tag === 'string' && !noTrimWhitespacesArroundElements.has(node.tag);
+}
+
+function isCommentNode(node: PostHTML.Node | string | undefined) {
+    return typeof node === 'string' && isComment(node);
 }
 
 const mod: HtmlnanoModule<CollapseType> = {

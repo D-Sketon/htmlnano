@@ -364,7 +364,7 @@ Minified (with `conservative`):
 ## HTML Content
 
 ### collapseWhitespace
-Collapses redundant white spaces (including new lines). It doesn’t affect white spaces in the elements `<style>`, `<textarea>`, `<script>` and `<pre>`.
+Collapses redundant white spaces (including new lines). It doesn’t affect white spaces in the elements `<style>`, `<textarea>`, `<script>`, `<pre>`, and `<template>`.
 
 
 ### removeComments

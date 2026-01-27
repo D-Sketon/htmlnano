@@ -88,6 +88,14 @@ describe('collapseWhitespace', () => {
             );
         });
 
+        it('should preserve whitespace inside template content', () => {
+            return init(
+                '<template>  <div> a   b </div> </template>',
+                '<template>  <div> a   b </div> </template>',
+                options
+            );
+        });
+
         it('renders the documentation example correctly', () => {
             return init(
                 documentationHtml,
@@ -105,7 +113,7 @@ describe('collapseWhitespace', () => {
         it('should collapse redundant whitespaces and eliminate indentation (tabs, newlines, etc)', () => {
             return init(
                 html,
-                '<div><p>Hello world</p><pre>   <code>	posthtml    htmlnano     </code>	</pre><code>posthtml htmlnano</code> <b>hello world! </b><a>other link </a>Example</div>',
+                '<div><p>Hello world</p><pre>   <code>	posthtml    htmlnano     </code>	</pre><code> posthtml htmlnano </code> <b>hello world! </b><a>other link </a>Example</div>',
                 options
             );
         });
@@ -156,6 +164,22 @@ describe('collapseWhitespace', () => {
             return init(
                 '<div>before  <span>  text</span></div>',
                 '<div>before <span>text</span></div>',
+                options
+            );
+        });
+
+        it('preserves leading and trailing spaces inside code', () => {
+            return init(
+                '<div><code> foo </code><span>bar</span></div>',
+                '<div><code> foo </code><span>bar</span></div>',
+                options
+            );
+        });
+
+        it('drops whitespace-only text nodes between comments and block tags', () => {
+            return init(
+                '<div>foo<!--c-->   <p>bar</p></div>',
+                '<div>foo<!--c--><p>bar</p></div>',
                 options
             );
         });
