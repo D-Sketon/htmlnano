@@ -45,8 +45,7 @@ function isCommentToRemove(text: PostHTMLNodeLike, removeType: Partial<RemoveCom
     if (removeType === 'safe') {
         const commentBody = getCommentBody(text);
         const isNoindex = commentBody ? MATCH_NOINDEX_REGEXP.test(commentBody) : false;
-        // Don't remove noindex comments.
-        // See: https://yandex.com/support/webmaster/controlling-robot/html.xml
+        // Don't remove noindex comments. It was used by some search engines in the past.
         if (isNoindex) {
             return false;
         }
