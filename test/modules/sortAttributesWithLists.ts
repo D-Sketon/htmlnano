@@ -25,7 +25,27 @@ describe('sortAttributesWithLists', () => {
     it('frequency', () => {
         return init(
             '<div class="foo baz bar"></div><div class="bar foo"></div>',
-            '<div class="foo bar baz"></div><div class="foo bar"></div>',
+            '<div class="bar foo baz"></div><div class="bar foo"></div>',
+            {
+                sortAttributesWithLists: 'frequency'
+            }
+        );
+    });
+
+    it('frequency preserves duplicates', () => {
+        return init(
+            '<div class="foo foo bar"></div><div class="bar foo"></div>',
+            '<div class="foo foo bar"></div><div class="foo bar"></div>',
+            {
+                sortAttributesWithLists: 'frequency'
+            }
+        );
+    });
+
+    it('frequency alphabetical tie-break', () => {
+        return init(
+            '<div class="b a"></div><div class="a b"></div>',
+            '<div class="a b"></div><div class="a b"></div>',
             {
                 sortAttributesWithLists: 'frequency'
             }
@@ -36,6 +56,16 @@ describe('sortAttributesWithLists', () => {
         return init(
             '<a CLASS="foo baz bar">click</a>',
             '<a CLASS="bar baz foo">click</a>',
+            {
+                sortAttributesWithLists: 'alphabetical'
+            }
+        );
+    });
+
+    it('alphabetical trims redundant whitespace', () => {
+        return init(
+            '<div class="  foo   bar "></div>',
+            '<div class="bar foo"></div>',
             {
                 sortAttributesWithLists: 'alphabetical'
             }

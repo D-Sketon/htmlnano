@@ -309,6 +309,8 @@ The module won't impact the plain-text size of the output. However it will impro
 - `alphabetical`: Default option. Sort attribute values in alphabetical order.
 - `frequency`: Sort attribute values by frequency.
 
+Frequency sorting preserves duplicates, ignores redundant whitespace in the attribute value, and uses alphabetical ordering to break ties.
+
 #### Example
 
 **alphabetical**

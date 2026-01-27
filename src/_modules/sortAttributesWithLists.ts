@@ -18,6 +18,10 @@ class AttributeTokenChain {
 
     addFromNodeAttrsArray(attrValuesArray: string[]) {
         attrValuesArray.forEach((attrValue) => {
+            if (!attrValue) {
+                return;
+            }
+
             if (this.freqData.has(attrValue)) {
                 this.freqData.set(attrValue, this.freqData.get(attrValue)! + 1);
             } else {
@@ -28,20 +32,34 @@ class AttributeTokenChain {
 
     createSortOrder() {
         const _sortOrder = [...this.freqData.entries()];
-        _sortOrder.sort((a, b) => b[1] - a[1]);
+        _sortOrder.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
         this.sortOrder = _sortOrder.map(i => i[0]);
     }
 
     sortFromNodeAttrsArray(attrValuesArray: string[]) {
         const resultArray: string[] = [];
+        const tokenCounts = new Map<string, number>();
+
+        attrValuesArray.forEach((attrValue) => {
+            if (!attrValue) {
+                return;
+            }
+
+            tokenCounts.set(attrValue, (tokenCounts.get(attrValue) ?? 0) + 1);
+        });
 
         if (!this.sortOrder) {
             this.createSortOrder();
         }
 
         this.sortOrder!.forEach((k) => {
-            if (attrValuesArray.includes(k)) {
+            const count = tokenCounts.get(k);
+            if (!count) {
+                return;
+            }
+
+            for (let i = 0; i < count; i += 1) {
                 resultArray.push(k);
             }
         });
@@ -70,6 +88,8 @@ const mod: HtmlnanoModule<boolean | 'alphabetical' | 'frequency'> = {
 
 export default mod;
 
+const splitListAttributeValues = (attrValue: string) => attrValue.split(/\s+/).filter(Boolean);
+
 function sortAttributesWithListsInAlphabeticalOrder(tree: PostHTMLTreeLike) {
     tree.walk((node) => {
         if (!node.attrs) {
@@ -84,7 +104,10 @@ function sortAttributesWithListsInAlphabeticalOrder(tree: PostHTMLTreeLike) {
                 return;
             }
 
-            const attrValues = node.attrs![attrName]!.split(/\s/);
+            const attrValues = splitListAttributeValues(node.attrs![attrName]!);
+            if (attrValues.length < 2) {
+                return;
+            }
 
             node.attrs![attrName] = attrValues.sort((a, b) => {
                 // @ts-expect-error -- deliberately use minus operator to sort things
@@ -117,7 +140,7 @@ function sortAttributesWithListsByFrequency(tree: PostHTMLTreeLike) {
             }
 
             tokenChainObj[attrNameLower] = tokenChainObj[attrNameLower] || new AttributeTokenChain();
-            tokenChainObj[attrNameLower].addFromNodeAttrsArray(attrValues!.split(/\s/));
+            tokenChainObj[attrNameLower].addFromNodeAttrsArray(splitListAttributeValues(attrValues!));
         });
 
         return node;
@@ -139,7 +162,7 @@ function sortAttributesWithListsByFrequency(tree: PostHTMLTreeLike) {
             }
 
             if (tokenChainObj[attrNameLower]) {
-                node.attrs![attrName] = tokenChainObj[attrNameLower].sortFromNodeAttrsArray(attrValues!.split(/\s/)).join(' ');
+                node.attrs![attrName] = tokenChainObj[attrNameLower].sortFromNodeAttrsArray(splitListAttributeValues(attrValues!)).join(' ');
             }
         });
 
