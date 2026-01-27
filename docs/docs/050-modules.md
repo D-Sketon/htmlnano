@@ -570,6 +570,8 @@ Minified:
 ### minifyCss
 Minifies CSS with [cssnano](http://cssnano.co/) inside `<style>` tags and `style` attributes.
 
+Only `<style>` tags with a CSS type (`text/css` or no `type` attribute) are minified. Other style types (for example `text/less`) are left untouched. CDATA wrappers are preserved, even when surrounded by whitespace.
+
 You have to install `cssnano` and `postcss` in order to use this feature:
 
 ```bash

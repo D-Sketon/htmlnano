@@ -106,6 +106,23 @@ describe('minifyCss', function () {
         );
     });
 
+    it('should skip non-css <style> types', () => {
+        const html = '<style type="text/less">h1 { color: #ff0000; margin: 10px 10px 10px 10px; }</style>';
+        return init(
+            html,
+            html,
+            options
+        );
+    });
+
+    it('should minify <style> with text/css type', () => {
+        return init(
+            '<style type="text/css; charset=utf-8">h1 { color: #ff0000; margin: 10px 10px 10px 10px; }</style>',
+            '<style type="text/css; charset=utf-8">h1{color:red;margin:10px}</style>',
+            options
+        );
+    });
+
     it('should keep CSS inside SVG wrapped in CDATA', () => {
         return init(
             svg,

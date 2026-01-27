@@ -11,6 +11,9 @@ const postcssOptions = {
     from: undefined
 };
 
+const cdataStart = '<![CDATA[';
+const cdataEnd = ']]>';
+
 /** Minify CSS with cssnano */
 const mod: HtmlnanoModule<CssnanoOptions> = {
     async default(tree, _, cssnanoOptions) {
@@ -31,7 +34,7 @@ const mod: HtmlnanoModule<CssnanoOptions> = {
                 return node;
             }
 
-            if (isStyleNode(node)) {
+            if (isStyleNode(node) && isCssStyleType(node)) {
                 p = processStyleNode(node, cssnanoOptions, cssnano, postcss);
                 if (p) {
                     promises.push(p);
@@ -54,15 +57,11 @@ export default mod;
 
 function processStyleNode(styleNode: PostHTML.Node, cssnanoOptions: CssnanoOptions, cssnano: typeof import('cssnano'), postcss: typeof import('postcss').default) {
     let css = extractCssFromStyleNode(styleNode);
-    if (!css) return;
+    if (!css || css.trim() === '') return;
 
     // Improve performance by avoiding calling stripCdata again and again
-    let isCdataWrapped = false;
-    if (css.includes('CDATA')) {
-        const strippedCss = stripCdata(css);
-        isCdataWrapped = css !== strippedCss;
-        css = strippedCss;
-    }
+    const { strippedCss, isCdataWrapped } = stripCdata(css);
+    css = strippedCss;
 
     return postcss([cssnano(cssnanoOptions)])
         .process(css, postcssOptions)
@@ -81,7 +80,11 @@ function processStyleAttr(node: PostHTML.Node, cssnanoOptions: CssnanoOptions, c
     const wrapperStart = 'a{';
     const wrapperEnd = '}';
 
-    if (!node.attrs || !node.attrs.style) {
+    if (!node.attrs || !node.attrs.style || typeof node.attrs.style !== 'string') {
+        return;
+    }
+
+    if (node.attrs.style.trim() === '') {
         return;
     }
 
@@ -100,11 +103,29 @@ function processStyleAttr(node: PostHTML.Node, cssnanoOptions: CssnanoOptions, c
 }
 
 function stripCdata(css: string) {
-    const leftStrippedCss = css.replace('<![CDATA[', '');
-    if (leftStrippedCss === css) {
-        return css;
+    const trimmed = css.trim();
+    if (!trimmed.startsWith(cdataStart) || !trimmed.endsWith(cdataEnd)) {
+        return { strippedCss: css, isCdataWrapped: false };
     }
 
-    const strippedCss = leftStrippedCss.replace(']]>', '');
-    return leftStrippedCss === strippedCss ? css : strippedCss;
+    const strippedCss = trimmed.slice(cdataStart.length, trimmed.length - cdataEnd.length);
+    return { strippedCss, isCdataWrapped: true };
+}
+
+function isCssStyleType(node: PostHTML.Node) {
+    if (!node.attrs || !('type' in node.attrs)) {
+        return true;
+    }
+
+    const rawType = node.attrs.type;
+    if (rawType === '') {
+        return true;
+    }
+
+    if (typeof rawType !== 'string') {
+        return false;
+    }
+
+    const normalizedType = rawType.trim().toLowerCase();
+    return /^text\/css(?:$|\s*;)/.test(normalizedType);
 }
