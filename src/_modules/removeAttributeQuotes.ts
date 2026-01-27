@@ -4,10 +4,21 @@
 
 import type { HtmlnanoModule } from '../types';
 
+type RemoveAttributeQuotesOptions = {
+    force?: boolean;
+};
+
 /** Disable quoteAllAttributes while not overriding the configuration */
-const mod: HtmlnanoModule = {
-    default: function removeAttributeQuotes(tree) {
-        if (tree.options) tree.options.quoteAllAttributes ??= false;
+const mod: HtmlnanoModule<RemoveAttributeQuotesOptions> = {
+    default: function removeAttributeQuotes(tree, _options, moduleOptions) {
+        tree.options ??= {};
+
+        if (moduleOptions && typeof moduleOptions === 'object' && moduleOptions.force) {
+            tree.options.quoteAllAttributes = false;
+            return tree;
+        }
+
+        tree.options.quoteAllAttributes ??= false;
 
         return tree;
     }

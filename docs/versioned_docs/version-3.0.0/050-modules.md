@@ -494,6 +494,9 @@ Due to [the limitation of PostHTML](https://github.com/posthtml/htmlnano/issues/
 ### removeAttributeQuotes
 Remove quotes around attributes when possible, see [HTML Standard - 12.1.2.3 Attributes - Unquoted attribute value syntax](https://html.spec.whatwg.org/multipage/syntax.html#attributes-2).
 
+#### Options
+- `force` — if `true`, forces `quoteAllAttributes` to `false` even when other PostHTML options or plugins set it to `true`.
+
 #### Example
 Source:
 ```html

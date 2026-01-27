@@ -39,7 +39,9 @@ export interface HtmlnanoOptions {
     minifyJson?: boolean;
     minifySvg?: SvgoOptimizeOptions | boolean;
     normalizeAttributeValues?: boolean;
-    removeAttributeQuotes?: boolean;
+    removeAttributeQuotes?: boolean | {
+        force?: boolean;
+    };
     removeComments?: boolean | 'safe' | 'all' | RegExp | ((comment: string) => boolean);
     removeEmptyAttributes?: boolean;
     removeRedundantAttributes?: boolean;
