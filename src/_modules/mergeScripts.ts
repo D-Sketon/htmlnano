@@ -8,28 +8,82 @@ type ScriptTracking = {
 };
 
 function normalizeAsyncAttr(attrs: PostHTML.NodeAttributes) {
-    if (attrs && attrs.async === '') {
+    if (!attrs) {
+        return;
+    }
+
+    if (attrs.async === '') {
         (attrs as Record<string, string | boolean>).async = true;
+    }
+
+    if (attrs.nomodule === '') {
+        (attrs as Record<string, string | boolean>).nomodule = true;
     }
 }
 
 function getScriptType(attrs: PostHTML.NodeAttributes) {
-    return attrs.type || 'text/javascript';
+    const type = attrs.type || 'text/javascript';
+
+    return typeof type === 'string' ? type.toLowerCase() : 'text/javascript';
 }
 
 function isMergeableScriptType(type: string) {
     return type === 'text/javascript' || type === 'application/javascript';
 }
 
+const booleanAttrs = new Set(['async', 'defer', 'nomodule']);
+
+function normalizeScriptAttrsForKey(attrs: PostHTML.NodeAttributes, scriptType: string) {
+    const normalized: Record<string, string | boolean> = {
+        type: scriptType
+    };
+
+    for (const [key, value] of Object.entries(attrs)) {
+        if (key === 'src' || key === 'integrity' || key === 'type') {
+            continue;
+        }
+
+        if (value === undefined) {
+            continue;
+        }
+
+        if (booleanAttrs.has(key)) {
+            normalized[key] = true;
+            continue;
+        }
+
+        normalized[key] = value as string | boolean;
+    }
+
+    return normalized;
+}
+
 function buildScriptKey(attrs: PostHTML.NodeAttributes, scriptType: string, scriptSrcIndex: number) {
-    return JSON.stringify({
-        id: attrs.id,
-        class: attrs.class,
-        type: scriptType,
-        defer: attrs.defer !== undefined,
-        async: attrs.async !== undefined,
-        index: scriptSrcIndex
-    });
+    const normalizedAttrs = normalizeScriptAttrsForKey(attrs, scriptType);
+    const keyObject: Record<string, string | boolean | number> = {
+        index: scriptSrcIndex,
+        ...normalizedAttrs
+    };
+    const sortedKeys = Object.keys(keyObject).sort();
+    const sortedKeyObject: Record<string, string | boolean | number> = {};
+
+    for (const key of sortedKeys) {
+        sortedKeyObject[key] = keyObject[key];
+    }
+
+    return JSON.stringify(sortedKeyObject);
+}
+
+function endsWithLineComment(scriptContent: string) {
+    const lastNewlineIndex = Math.max(
+        scriptContent.lastIndexOf('\n'),
+        scriptContent.lastIndexOf('\r')
+    );
+    const lastLine = lastNewlineIndex === -1
+        ? scriptContent
+        : scriptContent.slice(lastNewlineIndex + 1);
+
+    return /\/\/.*$/.test(lastLine);
 }
 
 function mergeScriptNodes(
@@ -47,7 +101,17 @@ function mergeScriptNodes(
         scriptNodes.reverse().forEach((scriptNode) => {
             let scriptContent = extractTextContentFromNode(scriptNode).trim();
 
-            if (scriptContent.slice(-1) !== ';') {
+            if (!scriptContent) {
+                tracking.removedScriptNodes.add(scriptNode);
+                // @ts-expect-error -- remove node
+                scriptNode.tag = false;
+                scriptNode.content = [];
+                return;
+            }
+
+            if (endsWithLineComment(scriptContent)) {
+                scriptContent += '\n;';
+            } else if (scriptContent.slice(-1) !== ';') {
                 scriptContent += ';';
             }
 

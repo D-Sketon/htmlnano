@@ -111,4 +111,28 @@ describe('mergeScripts', () => {
             options
         );
     });
+
+    it('should not merge scripts with different nonce values', () => {
+        return init(
+            '<script nonce="a">window.foo = 1</script><script nonce="b">window.bar = 2</script>',
+            '<script nonce="a">window.foo = 1</script><script nonce="b">window.bar = 2</script>',
+            options
+        );
+    });
+
+    it('should keep nomodule scripts separate from default scripts', () => {
+        return init(
+            '<script>window.foo = 1</script><script nomodule>window.bar = 2</script><script nomodule>window.baz = 3</script>',
+            '<script>window.foo = 1</script><script nomodule>window.bar = 2;window.baz = 3</script>',
+            options
+        );
+    });
+
+    it('should separate scripts ending with line comments', () => {
+        return init(
+            '<script>foo()\n// comment</script><script>(bar())</script>',
+            '<script>foo()\n// comment\n;(bar())</script>',
+            options
+        );
+    });
 });

@@ -540,7 +540,7 @@ Minified:
 
 
 ### mergeScripts
-Merge multiple `<script>` with the same attributes (`id, class, type, async, defer`) into one (last) tag.
+Merge multiple `<script>` with the same attributes (all except `src`/`integrity`, including `nonce` and `nomodule`) into one (last) tag.
 
 #### Side effects
 It could break your code if the tags with different attributes share the same variable scope.
