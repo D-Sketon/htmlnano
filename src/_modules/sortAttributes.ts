@@ -29,7 +29,12 @@ class AttributeTokenChain {
 
     createSortOrder() {
         const _sortOrder = [...this.freqData.entries()];
-        _sortOrder.sort((a, b) => b[1] - a[1]);
+        _sortOrder.sort((a, b) => {
+            const freqDiff = b[1] - a[1];
+            if (freqDiff !== 0) return freqDiff;
+
+            return a[0].localeCompare(b[0]);
+        });
 
         this.sortOrder = _sortOrder.map(i => i[0]);
     }
@@ -37,20 +42,33 @@ class AttributeTokenChain {
     sortFromNodeAttrs(nodeAttrs: Record<string, string | void>) {
         const newAttrs: Record<string, string | void> = {};
 
-        // Convert node.attrs attrName into lower case.
-        const loweredNodeAttrs: Record<string, string | void> = {};
+        // Convert node.attrs attrName into lower case while preserving originals.
+        const loweredNodeAttrs: Record<string, { name: string; value: string | void }> = {};
         Object.entries(nodeAttrs).forEach(([attrName, attrValue]) => {
-            loweredNodeAttrs[attrName.toLowerCase()] = attrValue;
+            const attrNameLower = attrName.toLowerCase();
+            if (!loweredNodeAttrs[attrNameLower]) {
+                loweredNodeAttrs[attrNameLower] = { name: attrName, value: attrValue };
+            }
         });
 
         if (!this.sortOrder) {
             this.createSortOrder();
         }
 
+        const seen = new Set<string>();
+
         this.sortOrder!.forEach((attrNameLower) => {
             // The attrName inside "sortOrder" has been lowered
-            if (loweredNodeAttrs[attrNameLower] != null) {
-                newAttrs[attrNameLower] = loweredNodeAttrs[attrNameLower];
+            const originalAttr = loweredNodeAttrs[attrNameLower];
+            if (originalAttr != null) {
+                newAttrs[originalAttr.name] = originalAttr.value;
+                seen.add(attrNameLower);
+            }
+        });
+
+        Object.entries(loweredNodeAttrs).forEach(([attrNameLower, originalAttr]) => {
+            if (!seen.has(attrNameLower)) {
+                newAttrs[originalAttr.name] = originalAttr.value;
             }
         });
 
