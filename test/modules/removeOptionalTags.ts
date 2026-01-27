@@ -45,8 +45,19 @@ describe('removeOptionalTags', () => {
             <html>
                 <!-- where is this comment in the DOM? -->
             </html>`;
+            const expected = `
+            
+                <!-- where is this comment in the DOM? -->
+            `;
 
-            return init(input, input, options);
+            return init(input, expected, options);
+        });
+
+        it('first thing inside <html> is whitespace then comment', () => {
+            const input = '<html> <!-- where is this comment in the DOM? --><p>Hi</p></html>';
+            const expected = ' <!-- where is this comment in the DOM? --><p>Hi</p>';
+
+            return init(input, expected, options);
         });
 
         it('<html> is not immediately followed by a comment', () => {
@@ -56,6 +67,13 @@ describe('removeOptionalTags', () => {
             </html><!-- where is this comment in the DOM? -->`;
 
             return init(input, input, options);
+        });
+
+        it('<html> followed by whitespace then comment', () => {
+            const input = '<html><p>Hi</p></html> <!-- comment -->';
+            const expected = '<p>Hi</p> <!-- comment -->';
+
+            return init(input, expected, options);
         });
     });
 
@@ -67,6 +85,12 @@ describe('removeOptionalTags', () => {
             return init(input, expected, options);
         });
 
+        it('<head> first child is whitespace', () => {
+            const input = '<head> <title>Title</title></head>';
+
+            return init(input, input, options);
+        });
+
         it('<head> surrouned by whitespaces', () => {
             const input = `
             <!DOCTYPE HTML>
@@ -76,8 +100,16 @@ describe('removeOptionalTags', () => {
                     <title>Hello</title>
                 </head>
             </html>`;
+            const expected = `
+            <!DOCTYPE HTML>
+            
+                <!-- prevent <html> being removed -->
+                <head>
+                    <title>Hello</title>
+                </head>
+            `;
 
-            return init(input, input, options);
+            return init(input, expected, options);
         });
 
         it('empty <head>', () => {
@@ -91,11 +123,11 @@ describe('removeOptionalTags', () => {
 
             const expected = `
             <!DOCTYPE HTML>
-            <html>
+            
                 <!-- prevent <html> being removed -->
                 
     
-                </html>`;
+                `;
 
             return init(input, expected, options);
         });
@@ -159,10 +191,41 @@ describe('removeOptionalTags', () => {
             return init(input, input, options);
         });
 
+        it('first child link keeps <body>', () => {
+            const input = '<body><link rel="stylesheet"><p>htmlnano</p></body>';
+
+            return init(input, input, options);
+        });
+
+        it('first child script keeps <body>', () => {
+            const input = '<body><script></script><p>htmlnano</p></body>';
+
+            return init(input, input, options);
+        });
+
+        it('first child template keeps <body>', () => {
+            const input = '<body><template></template><p>htmlnano</p></body>';
+
+            return init(input, input, options);
+        });
+
+        it('first child comment keeps <body>', () => {
+            const input = '<body><!-- comment --><p>htmlnano</p></body>';
+
+            return init(input, input, options);
+        });
+
         it('<body> followed by comment keeps tag', () => {
             const input = '<body><p>htmlnano</p></body><!-- comment -->';
 
             return init(input, input, options);
+        });
+
+        it('<body> followed by whitespace can be omitted', () => {
+            const input = '<body><p>htmlnano</p></body> \n';
+            const expected = '<p>htmlnano</p> \n';
+
+            return init(input, expected, options);
         });
     });
 
@@ -220,8 +283,20 @@ describe('removeOptionalTags', () => {
             return init(input, input, options);
         });
 
+        it('first child is whitespace then <col>', () => {
+            const input = '<colgroup> <col></colgroup>';
+
+            return init(input, input, options);
+        });
+
         it('<colgroup> followed by comment', () => {
             const input = '<colgroup><div></div><col><col></colgroup><!-- comment -->';
+
+            return init(input, input, options);
+        });
+
+        it('<colgroup> with comment after keeps tag', () => {
+            const input = '<colgroup><col></colgroup><!-- comment -->';
 
             return init(input, input, options);
         });
@@ -268,6 +343,18 @@ describe('removeOptionalTags', () => {
 
         it('<tbody> preceded by <thead>', () => {
             const input = '<table><thead></thead><tbody><tr></tr></tbody></table>';
+
+            return init(input, input, options);
+        });
+
+        it('first child is whitespace then <tr>', () => {
+            const input = '<table><tbody> <tr></tr></tbody></table>';
+
+            return init(input, input, options);
+        });
+
+        it('first child is comment keeps <tbody>', () => {
+            const input = '<table><tbody><!-- comment --><tr></tr></tbody></table>';
 
             return init(input, input, options);
         });

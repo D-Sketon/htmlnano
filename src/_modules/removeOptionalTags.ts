@@ -6,7 +6,7 @@ const startWithWhitespacePattern = /^\s+/;
 
 type OptionalTagNode = PostHTML.Node & { optionalTagName?: string };
 
-const bodyStartTagCantBeOmittedWithFirstChildTags = new Set(['meta', 'link', 'script', 'style']);
+const bodyStartTagCantBeOmittedWithFirstChildTags = new Set(['meta', 'link', 'script', 'style', 'template']);
 const tbodyStartTagCantBeOmittedWithPrecededTags = new Set(['tbody', 'thead', 'tfoot']);
 const tbodyEndTagCantBeOmittedWithFollowedTags = new Set(['tbody', 'tfoot']);
 
@@ -96,11 +96,9 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
         if (node.attrs && Object.keys(node.attrs).length) return node;
 
         // const prevNode = getPrevNode(tree, index);
-        const prevNonEmptyNode = getPrevNode(tree, index, true);
+        const prevNode = getPrevNode(tree, index);
         const nextNode = getNextNode(tree, index);
-        const nextNonEmptyNode = getNextNode(tree, index, true);
         const firstChildNode = getFirstChildTag(node, false);
-        const firstNonEmptyChildNode = getFirstChildTag(node);
 
         /**
          * An "html" element's start tag may be omitted if the first thing inside the "html" element is not a comment.
@@ -110,11 +108,11 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
             let isHtmlStartTagCanBeOmitted = true;
             let isHtmlEndTagCanBeOmitted = true;
 
-            if (typeof firstNonEmptyChildNode === 'string' && isComment(firstNonEmptyChildNode)) {
+            if (typeof firstChildNode === 'string' && isComment(firstChildNode)) {
                 isHtmlStartTagCanBeOmitted = false;
             }
 
-            if (typeof nextNonEmptyNode === 'string' && isComment(nextNonEmptyNode)) {
+            if (typeof nextNode === 'string' && isComment(nextNode)) {
                 isHtmlEndTagCanBeOmitted = false;
             }
 
@@ -133,14 +131,15 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
 
             if (
                 isEmptyNode(node)
-                || (firstNonEmptyChildNode && typeof firstNonEmptyChildNode === 'object' && firstNonEmptyChildNode.tag)
+                || (firstChildNode && typeof firstChildNode === 'object' && firstChildNode.tag)
             ) {
                 isHeadStartTagCanBeOmitted = true;
             }
 
             if (
-                (nextNode && typeof nextNode === 'string' && startWithWhitespacePattern.test(nextNode))
-                || (nextNonEmptyNode && typeof nextNonEmptyNode === 'string' && isComment(nextNode))
+                nextNode
+                && typeof nextNode === 'string'
+                && (startWithWhitespacePattern.test(nextNode) || isComment(nextNode))
             ) {
                 isHeadEndTagCanBeOmitted = false;
             }
@@ -160,12 +159,12 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
 
             if (
                 (typeof firstChildNode === 'string' && startWithWhitespacePattern.test(firstChildNode))
-                || (typeof firstNonEmptyChildNode === 'string' && isComment(firstNonEmptyChildNode))
+                || (typeof firstChildNode === 'string' && isComment(firstChildNode))
             ) {
                 isBodyStartTagCanBeOmitted = false;
             }
 
-            if (firstNonEmptyChildNode && typeof firstNonEmptyChildNode === 'object' && firstNonEmptyChildNode.tag && bodyStartTagCantBeOmittedWithFirstChildTags.has(firstNonEmptyChildNode.tag)) {
+            if (firstChildNode && typeof firstChildNode === 'object' && firstChildNode.tag && bodyStartTagCantBeOmittedWithFirstChildTags.has(firstChildNode.tag)) {
                 isBodyStartTagCanBeOmitted = false;
             }
 
@@ -186,17 +185,18 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
             let isColgroupStartTagCanBeOmitted = false;
             let isColgroupEndTagCanBeOmitted = true;
 
-            if (firstNonEmptyChildNode && typeof firstNonEmptyChildNode === 'object' && firstNonEmptyChildNode.tag && firstNonEmptyChildNode.tag === 'col') {
+            if (firstChildNode && typeof firstChildNode === 'object' && firstChildNode.tag && firstChildNode.tag === 'col') {
                 isColgroupStartTagCanBeOmitted = true;
             }
 
-            if (prevNonEmptyNode && typeof prevNonEmptyNode === 'object' && getNodeTagName(prevNonEmptyNode) === 'colgroup') {
+            if (prevNode && typeof prevNode === 'object' && getNodeTagName(prevNode) === 'colgroup') {
                 isColgroupStartTagCanBeOmitted = false;
             }
 
             if (
-                (nextNode && typeof nextNode === 'string' && startWithWhitespacePattern.test(nextNode))
-                || (nextNonEmptyNode && typeof nextNonEmptyNode === 'string' && isComment(nextNonEmptyNode))
+                nextNode
+                && typeof nextNode === 'string'
+                && (startWithWhitespacePattern.test(nextNode) || isComment(nextNode))
             ) {
                 isColgroupEndTagCanBeOmitted = false;
             }
@@ -214,19 +214,19 @@ function removeOptionalTags(tree: PostHTMLTreeLike | PostHTMLNodeLike[]) {
             let isTbodyStartTagCanBeOmitted = false;
             let isTbodyEndTagCanBeOmitted = true;
 
-            if (firstNonEmptyChildNode && typeof firstNonEmptyChildNode === 'object' && firstNonEmptyChildNode.tag && firstNonEmptyChildNode.tag === 'tr') {
+            if (firstChildNode && typeof firstChildNode === 'object' && firstChildNode.tag && firstChildNode.tag === 'tr') {
                 isTbodyStartTagCanBeOmitted = true;
             }
 
-            if (prevNonEmptyNode && typeof prevNonEmptyNode === 'object') {
-                const prevTagName = getNodeTagName(prevNonEmptyNode);
+            if (prevNode && typeof prevNode === 'object') {
+                const prevTagName = getNodeTagName(prevNode);
                 if (prevTagName && tbodyStartTagCantBeOmittedWithPrecededTags.has(prevTagName)) {
                     isTbodyStartTagCanBeOmitted = false;
                 }
             }
 
-            if (nextNonEmptyNode && typeof nextNonEmptyNode === 'object') {
-                const nextTagName = getNodeTagName(nextNonEmptyNode);
+            if (nextNode && typeof nextNode === 'object') {
+                const nextTagName = getNodeTagName(nextNode);
                 if (nextTagName && tbodyEndTagCantBeOmittedWithFollowedTags.has(nextTagName)) {
                     isTbodyEndTagCanBeOmitted = false;
                 }
