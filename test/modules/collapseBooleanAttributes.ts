@@ -49,10 +49,12 @@ describe('collapseBooleanAttributes', () => {
         return init(
             '<script defer=""></script>'
             + '<style amp-custom=""></style>'
+            + '<amp-accordion expanded="true"></amp-accordion>'
             + '<amp-video preload="metadata"></amp-video>',
 
             '<script defer></script>'
             + '<style amp-custom></style>'
+            + '<amp-accordion expanded></amp-accordion>'
             + '<amp-video preload="metadata"></amp-video>',
 
             optionsWithAmp
@@ -83,6 +85,14 @@ describe('collapseBooleanAttributes', () => {
         );
     });
 
+    it('should collapse crossorigin case-insensitively', () => {
+        return init(
+            '<script src="example-framework.js" crossorigin="Anonymous"></script>',
+            '<script src="example-framework.js" crossorigin></script>',
+            options
+        );
+    });
+
     it('should collapse crossorigin="" attribute', () => {
         return init(
             '<script src="example-framework.js" crossorigin=""></script>',
@@ -102,6 +112,14 @@ describe('collapseBooleanAttributes', () => {
     it('should remove preload="auto" from <audio> & <video>', () => {
         return init(
             '<audio src="example.com" preload="auto"></audio><video src="example.com" preload="auto"></video>',
+            '<audio src="example.com" preload></audio><video src="example.com" preload></video>',
+            options
+        );
+    });
+
+    it('should remove preload="AUTO" from <audio> & <video>', () => {
+        return init(
+            '<audio src="example.com" preload="AUTO"></audio><video src="example.com" preload="AUTO"></video>',
             '<audio src="example.com" preload></audio><video src="example.com" preload></video>',
             options
         );

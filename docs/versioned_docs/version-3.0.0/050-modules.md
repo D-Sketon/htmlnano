@@ -111,6 +111,8 @@ to collapse additonal, AMP-specific boolean attributes:
     "amphtml": true
 }
 ```
+When `amphtml` is enabled, AMP boolean attributes are collapsed when their
+value is empty, `true`, or matches the attribute name.
 
 #### Side effects
 This module could break your styles or JS if you use selectors with attributes:

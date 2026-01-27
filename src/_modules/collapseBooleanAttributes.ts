@@ -131,50 +131,59 @@ const mod: HtmlnanoModule<CollapseBooleanAttributesOptions> = {
             if (!node.tag) return attrs;
 
             const newAttrs = attrs;
+            const tagName = node.tag.toLowerCase();
 
-            if (tagsHasMissingValueDefaultEmptyStringAttributes.has(node.tag)) {
-                const tagAttributesCanBeReplacedWithEmptyString = missingValueDefaultEmptyStringAttributes[node.tag];
+            if (tagsHasMissingValueDefaultEmptyStringAttributes.has(tagName)) {
+                const tagAttributesCanBeReplacedWithEmptyString = missingValueDefaultEmptyStringAttributes[tagName];
 
-                for (const attributesCanBeReplacedWithEmptyString of Object.keys(tagAttributesCanBeReplacedWithEmptyString)) {
+                for (const attributeName of Object.keys(tagAttributesCanBeReplacedWithEmptyString)) {
                     if (
-                        attributesCanBeReplacedWithEmptyString in attrs
-                        && attributesCanBeReplacedWithEmptyString in tagAttributesCanBeReplacedWithEmptyString
-                        && attrs[attributesCanBeReplacedWithEmptyString] === tagAttributesCanBeReplacedWithEmptyString[attributesCanBeReplacedWithEmptyString]
+                        attributeName in attrs
+                        && typeof attrs[attributeName] === 'string'
+                        && attrs[attributeName].toLowerCase() === tagAttributesCanBeReplacedWithEmptyString[attributeName]
                     ) {
-                        attrs[attributesCanBeReplacedWithEmptyString] = true;
+                        attrs[attributeName] = true;
                     }
                 }
             }
 
             for (const attrName of Object.keys(attrs)) {
-                if (attrName === 'visible' && node.tag.startsWith('a-')) {
+                const attrNameLower = attrName.toLowerCase();
+
+                if (attrNameLower === 'visible' && tagName.startsWith('a-')) {
                     continue;
                 }
 
-                if (htmlBooleanAttributes.has(attrName)) {
+                if (htmlBooleanAttributes.has(attrNameLower)) {
                     newAttrs[attrName] = true;
+                    continue;
                 }
 
                 // Fast path optimization.
                 // The rest of tranformations are only for string type attrValue.
-                if (typeof newAttrs[attrName] !== 'string') continue;
+                const attrValue = newAttrs[attrName];
+                if (typeof attrValue !== 'string') continue;
+                const attrValueLower = attrValue.toLowerCase();
 
-                if (moduleOptions.amphtml && amphtmlBooleanAttributes.has(attrName) && attrs[attrName] === '') {
+                if (
+                    moduleOptions.amphtml
+                    && amphtmlBooleanAttributes.has(attrNameLower)
+                    && (attrValue === '' || attrValueLower === 'true' || attrValueLower === attrNameLower)
+                ) {
                     newAttrs[attrName] = true;
+                    continue;
                 }
+
                 // https://html.spec.whatwg.org/#a-quick-introduction-to-html
                 // The value, along with the "=" character, can be omitted altogether if the value is the empty string.
-                if (attrs[attrName] === '') {
+                if (attrValue === '') {
                     newAttrs[attrName] = true;
+                    continue;
                 }
 
                 // collapse crossorigin attributes
                 // Specification: https://html.spec.whatwg.org/multipage/urls-and-fetching.html#cors-settings-attributes
-                if (
-                    attrName.toLowerCase() === 'crossorigin' && (
-                        attrs[attrName] === 'anonymous'
-                    )
-                ) {
+                if (attrNameLower === 'crossorigin' && attrValueLower === 'anonymous') {
                     newAttrs[attrName] = true;
                 }
             }
