@@ -38,6 +38,19 @@ describe('minifyJson', () => {
         );
     });
 
+    it('should minify JSON with mixed case +json mime type', () => {
+        return init(
+            `<script type="Application/LD+JSON; charset=UTF-8">
+                {
+                    "test": 8
+                }
+             </script>`,
+
+            '<script type="Application/LD+JSON; charset=UTF-8">{"test":8}</script>',
+            options
+        );
+    });
+
     it('should skip JSON inside <script> tags with SRI', () => {
         const fixtures = `<script type="application/json" integrity="example">
                 {
@@ -61,6 +74,14 @@ describe('minifyJson', () => {
         return init(
             '<script>{"test": 5}</script>',
             '<script>{"test": 5}</script>',
+            options
+        );
+    });
+
+    it('should skip <script> tags with JSON-like mime type suffixes', () => {
+        return init(
+            '<script type="application/jsonp">{"test": 9}</script>',
+            '<script type="application/jsonp">{"test": 9}</script>',
             options
         );
     });

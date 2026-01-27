@@ -671,7 +671,7 @@ Minified:
 
 
 ### minifyJson
-Minifies JSON inside `<script type="application/json"></script>`.
+Minifies JSON inside `<script>` tags whose `type` ends in `/json` or `+json` (case-insensitive), including when MIME parameters are present.
 
 #### Example
 Source:

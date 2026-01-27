@@ -1,6 +1,8 @@
 import type { HtmlnanoModule } from '../types';
 
-const rNodeAttrsTypeJson = /(\/|\+)json/;
+const rNodeAttrsTypeJson = /(?:\/|\+)json$/i;
+
+const getMimeType = (type: string) => type.split(';', 1)[0]?.trim();
 
 const mod: HtmlnanoModule = {
     onContent() {
@@ -10,18 +12,22 @@ const mod: HtmlnanoModule = {
                 return content;
             }
 
-            if (node.attrs && node.attrs.type && rNodeAttrsTypeJson.test(node.attrs.type)) {
+            const nodeType = node.attrs && typeof node.attrs.type === 'string'
+                ? getMimeType(node.attrs.type)
+                : undefined;
+
+            if (nodeType && rNodeAttrsTypeJson.test(nodeType)) {
                 try {
-                    // cast minified JSON to an array
-                    let jsonContent = '';
-                    for (let i = 0, len = content.length; i < len; i++) {
-                        const item = content[i];
-                        if (typeof item === 'string') {
-                            jsonContent += item;
-                        } else {
-                            return content; // If any item is not a string, return original contents
-                        }
+                    const jsonContent = typeof content === 'string'
+                        ? content
+                        : Array.isArray(content) && content.every(item => typeof item === 'string')
+                            ? content.join('')
+                            : null;
+
+                    if (jsonContent === null) {
+                        return content;
                     }
+
                     return [JSON.stringify(JSON.parse(jsonContent))];
                 } catch {
                     // Invalid JSON
