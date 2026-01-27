@@ -1,7 +1,9 @@
 import { init } from '../htmlnano.ts';
 import safePreset from '../../dist/presets/safe.mjs';
+import type { HtmlnanoOptions } from '../../src/types.js';
 
 describe('minifyConditionalComments', () => {
+    const safePresetOptions = safePreset as HtmlnanoOptions;
     const fixture = {
         fullHtml: `
 <!DOCTYPE html>
@@ -60,7 +62,7 @@ describe('minifyConditionalComments', () => {
             fixture.fullHtml,
             fixture.fullHtmlMinified,
             {
-                ...safePreset,
+                ...safePresetOptions,
                 minifyConditionalComments: true
             }
         );
@@ -71,7 +73,7 @@ describe('minifyConditionalComments', () => {
             fixture.multipleConditionalComment,
             fixture.multipleConditionalCommentMinified,
             {
-                ...safePreset,
+                ...safePresetOptions,
                 minifyConditionalComments: true
             }
         );

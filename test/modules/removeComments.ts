@@ -5,7 +5,7 @@ import maxPreset from '../../dist/presets/max.mjs';
 describe('removeComments', () => {
     context('safe (default)', () => {
         const options = {
-            removeComments: safePreset.removeComments
+            removeComments: safePreset.removeComments as 'safe'
         };
 
         it('should remove HTML comments', () => {
@@ -68,7 +68,7 @@ describe('removeComments', () => {
 
     context('all', () => {
         const options = {
-            removeComments: maxPreset.removeComments
+            removeComments: maxPreset.removeComments as 'all'
         };
 
         it('should remove <!--noindex--> and <!--/noindex-->', () => {

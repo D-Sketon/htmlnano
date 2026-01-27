@@ -1,4 +1,5 @@
 import { init } from '../htmlnano.ts';
+import type { HtmlnanoOptions } from '../../src/types.js';
 import safePreset from '../../dist/presets/safe.mjs';
 import maxPreset from '../../dist/presets/max.mjs';
 
@@ -50,8 +51,8 @@ describe('collapseWhitespace', () => {
                 </html> `;
 
     context('all', () => {
-        const options = {
-            collapseWhitespace: maxPreset.collapseWhitespace
+        const options: HtmlnanoOptions = {
+            collapseWhitespace: maxPreset.collapseWhitespace as HtmlnanoOptions['collapseWhitespace']
         };
 
         it('should collapse redundant whitespaces', () => {
@@ -97,7 +98,7 @@ describe('collapseWhitespace', () => {
     });
 
     context('aggressive', () => {
-        const options = {
+        const options: HtmlnanoOptions = {
             collapseWhitespace: 'aggressive'
         };
 
@@ -161,8 +162,8 @@ describe('collapseWhitespace', () => {
     });
 
     context('conservative (default)', () => {
-        const options = {
-            collapseWhitespace: safePreset.collapseWhitespace
+        const options: HtmlnanoOptions = {
+            collapseWhitespace: safePreset.collapseWhitespace as HtmlnanoOptions['collapseWhitespace']
         };
 
         it('should collapse to 1 space', () => {

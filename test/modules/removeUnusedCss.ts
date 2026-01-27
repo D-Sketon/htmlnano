@@ -66,7 +66,7 @@ describe('removeUnusedCss (uncss)', function () {
 describe('removeUnusedCss (purgeCSS)', function () {
     const options = {
         removeUnusedCss: {
-            tool: 'purgeCSS'
+            tool: 'purgeCSS' as const
         }
     };
     const html = `<div><style>
