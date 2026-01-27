@@ -14,6 +14,14 @@ describe('removeRedundantAttributes', () => {
         );
     });
 
+    it('should remove method="GET" from <form>', () => {
+        return init(
+            '<form method=" GET "></form>',
+            '<form></form>',
+            options
+        );
+    });
+
     it('should remove type="text" from <input>', () => {
         return init(
             '<input type="text">',
@@ -46,6 +54,14 @@ describe('removeRedundantAttributes', () => {
         );
     });
 
+    it('should remove redundant script attributes regardless of case', () => {
+        return init(
+            '<script type=" Text/JavaScript " language="JAVASCRIPT"></script>',
+            '<script></script>',
+            options
+        );
+    });
+
     it('shouldn\'t remove type=module from <script>', () => {
         return init(
             '<script type="module"></script>',
@@ -58,6 +74,14 @@ describe('removeRedundantAttributes', () => {
         return init(
             '<script charset="UTF-8">alert();</script><script src="foo.js" charset="UTF-8"></script>',
             '<script>alert();</script><script src="foo.js" charset="UTF-8"></script>',
+            options
+        );
+    });
+
+    it('should keep "charset" when <script> has a src attribute', () => {
+        return init(
+            '<script src="" charset="utf-8"></script>',
+            '<script src="" charset="utf-8"></script>',
             options
         );
     });
@@ -78,10 +102,26 @@ describe('removeRedundantAttributes', () => {
         );
     });
 
+    it('should remove media="all" regardless of case', () => {
+        return init(
+            '<style media=" ALL "></style><link media="All">',
+            '<style></style><link>',
+            options
+        );
+    });
+
     it('should remove type="text/css" from link[rel=stylesheet]', () => {
         return init(
             '<link rel="stylesheet" type="text/css" href="style.css">',
             '<link rel="stylesheet" href="style.css">',
+            options
+        );
+    });
+
+    it('should remove type="text/css" from link[rel~=stylesheet]', () => {
+        return init(
+            '<link rel="preload StyleSheet" type=" TEXT/CSS " href="style.css">',
+            '<link rel="preload StyleSheet" href="style.css">',
             options
         );
     });
@@ -97,6 +137,14 @@ describe('removeRedundantAttributes', () => {
     it('should remove loading="eager" from <img> & <iframe>', () => {
         return init(
             '<img src="example.com" loading="eager"><iframe src="example.com" loading="eager"></iframe>',
+            '<img src="example.com"><iframe src="example.com"></iframe>',
+            options
+        );
+    });
+
+    it('should remove loading="eager" and decoding="auto" regardless of case', () => {
+        return init(
+            '<img src="example.com" loading=" EAGER " decoding=" AUTO "><iframe src="example.com" loading="Eager"></iframe>',
             '<img src="example.com"><iframe src="example.com"></iframe>',
             options
         );

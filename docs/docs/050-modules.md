@@ -66,10 +66,18 @@ Removes redundant attributes from tags if they contain default values:
 - `method="get"` from `<form>`
 - `type="text"` from `<input>`
 - `type="submit"` from `<button>`
-- `language="javascript"` and `type="text/javascript"` from `<script>`
+- `language="javascript"` and redundant JS `type` values from `<script>`
 - `charset` from `<script>` if it's an external script
 - `media="all"` from `<style>` and `<link>`
+- `type="text/css"` from `<style>`
 - `type="text/css"` from `<link rel="stylesheet">`
+- `loading="eager"` from `<img>` and `<iframe>`
+- `decoding="auto"` from `<img>`
+- `kind="subtitles"` from `<track>`
+- `wrap="soft"` from `<textarea>`
+- `shape="rect"` from `<area>`
+
+Attribute values are matched case-insensitively with surrounding whitespace ignored.
 
 #### Options
 This module is disabled by default, change option to true to enable this module.

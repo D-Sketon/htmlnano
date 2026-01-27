@@ -1,5 +1,36 @@
 import type { HtmlnanoModule } from '../types';
 
+type AttrValue = void | boolean | string;
+type Attrs = Record<string, AttrValue>;
+
+function normalizeAttrValue(value: AttrValue): string | null {
+    if (typeof value !== 'string') return null;
+
+    const trimmed = value.trim();
+    return trimmed.length === 0 ? '' : trimmed.toLowerCase();
+};
+
+function findAttrEntry(attrs: Attrs, name: string): { name: string; value: AttrValue } | null {
+    const targetName = name.toLowerCase();
+
+    for (const [attrName, attrValue] of Object.entries(attrs)) {
+        if (attrName.toLowerCase() === targetName) {
+            return { name: attrName, value: attrValue };
+        }
+    }
+
+    return null;
+};
+
+function getNormalizedAttrValue(attrs: Attrs, name: string): string | null {
+    const entry = findAttrEntry(attrs, name);
+    return entry ? normalizeAttrValue(entry.value) : null;
+};
+
+function hasAttr(attrs: Attrs, name: string): boolean {
+    return findAttrEntry(attrs, name) !== null;
+}
+
 // https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types#JavaScript_types
 export const redundantScriptTypes = new Set([
     'application/javascript',
@@ -21,7 +52,7 @@ export const redundantScriptTypes = new Set([
 ]);
 
 // https://html.spec.whatwg.org/multipage/common-microsyntaxes.html#missing-value-default
-const missingValueDefaultAttributes: Record<string, Record<string, string | ((attrs: Record<string, void | boolean | string>) => boolean)>> = {
+const missingValueDefaultAttributes: Record<string, Record<string, string | ((attrs: Attrs) => boolean)>> = {
     form: {
         method: 'get'
     },
@@ -38,25 +69,14 @@ const missingValueDefaultAttributes: Record<string, Record<string, string | ((at
     script: {
         language: 'javascript',
         type: (attrs) => {
-            for (const [attrName, attrValue] of Object.entries(attrs)) {
-                if (attrName.toLowerCase() !== 'type') {
-                    continue;
-                }
-
-                if (typeof attrValue === 'string') {
-                    return redundantScriptTypes.has(attrValue);
-                }
-
-                return false;
-            }
-
-            return false;
+            const typeValue = getNormalizedAttrValue(attrs, 'type');
+            return typeValue !== null && redundantScriptTypes.has(typeValue);
         },
         // Remove attribute if the function returns false
         charset: (attrs) => {
             // The charset attribute only really makes sense on “external” SCRIPT elements:
             // http://perfectionkills.com/optimizing-html/#8_script_charset
-            return !attrs.src;
+            return !hasAttr(attrs, 'src');
         }
     },
 
@@ -69,21 +89,18 @@ const missingValueDefaultAttributes: Record<string, Record<string, string | ((at
         media: 'all',
         type: (attrs) => {
             // https://html.spec.whatwg.org/multipage/links.html#link-type-stylesheet
-            let isRelStyleSheet = false;
-            let isTypeTextCSS = false;
+            const relValue = getNormalizedAttrValue(attrs, 'rel');
+            const typeValue = getNormalizedAttrValue(attrs, 'type');
 
-            if (attrs) {
-                for (const [attrName, attrValue] of Object.entries(attrs)) {
-                    if (attrName.toLowerCase() === 'rel' && attrValue === 'stylesheet') {
-                        isRelStyleSheet = true;
-                    }
-                    if (attrName.toLowerCase() === 'type' && attrValue === 'text/css') {
-                        isTypeTextCSS = true;
-                    }
-                }
+            if (!relValue || !typeValue) {
+                return false;
             }
 
-            // Only "text/css" is redudant for link[rel=stylesheet]. Otherwise "type" shouldn't be removed
+            const relTokens = relValue.split(/\s+/);
+            const isRelStyleSheet = relTokens.includes('stylesheet');
+            const isTypeTextCSS = typeValue === 'text/css';
+
+            // Only "text/css" is redundant for link[rel=stylesheet]. Otherwise "type" shouldn't be removed
             return isRelStyleSheet && isTypeTextCSS;
         }
     },
@@ -123,6 +140,7 @@ const mod: HtmlnanoModule = {
             if (!node.tag) return attrs;
 
             const newAttrs = attrs;
+            const attrsRecord = attrs as Attrs;
 
             if (tagsHaveMissingValueDefaultAttributes.has(node.tag)) {
                 const tagRedundantAttributes = missingValueDefaultAttributes[node.tag];
@@ -131,14 +149,17 @@ const mod: HtmlnanoModule = {
                     const tagRedundantAttributeValue = tagRedundantAttributes[redundantAttributeName];
                     let isRemove = false;
 
+                    const attrEntry = findAttrEntry(attrsRecord, redundantAttributeName);
+
                     if (typeof tagRedundantAttributeValue === 'function') {
-                        isRemove = tagRedundantAttributeValue(attrs);
-                    } else if (attrs[redundantAttributeName] === tagRedundantAttributeValue) {
-                        isRemove = true;
+                        isRemove = tagRedundantAttributeValue(attrsRecord);
+                    } else if (attrEntry) {
+                        const normalizedValue = normalizeAttrValue(attrEntry.value);
+                        isRemove = normalizedValue !== null && normalizedValue === tagRedundantAttributeValue;
                     }
 
-                    if (isRemove) {
-                        delete newAttrs[redundantAttributeName];
+                    if (isRemove && attrEntry) {
+                        delete newAttrs[attrEntry.name];
                     }
                 }
             }
