@@ -9,11 +9,14 @@ const mod: HtmlnanoModule<SvgoConfig> = {
 
         if (!svgo) return tree;
 
+        const resolvedSvgoOptions = resolveSvgoOptions(svgoOptions);
+        const svgoOptionsWithDefaults = applySvgoDefaults(resolvedSvgoOptions);
+
         tree.match({ tag: 'svg' }, (node) => {
             const svgStr = tree.render(node, { closingSingleTag: 'slash', quoteAllAttributes: true });
 
             try {
-                const result = svgo.optimize(svgStr, svgoOptions);
+                const result = svgo.optimize(svgStr, svgoOptionsWithDefaults);
                 // @ts-expect-error -- remove this node
                 node.tag = false;
                 node.attrs = {};
@@ -53,3 +56,17 @@ const mod: HtmlnanoModule<SvgoConfig> = {
 };
 
 export default mod;
+
+function resolveSvgoOptions(svgoOptions: SvgoConfig | true | null | undefined): SvgoConfig {
+    if (!svgoOptions || svgoOptions === true) {
+        return {};
+    }
+    return svgoOptions;
+}
+
+function applySvgoDefaults(svgoOptions: SvgoConfig): SvgoConfig {
+    return {
+        ...svgoOptions,
+        multipass: svgoOptions.multipass ?? true
+    };
+}

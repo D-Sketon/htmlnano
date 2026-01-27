@@ -714,6 +714,9 @@ htmlnano.process(html, {
 });
 ```
 
+`minifySvg: true` enables SVGO with its default configuration.
+htmlnano enables SVGO multipass by default; set `multipass: false` to disable it.
+
 #### Example
 Source:
 ```html

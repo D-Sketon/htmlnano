@@ -85,6 +85,16 @@ describe('minifySvg', () => {
         );
     });
 
+    it('should support boolean minifySvg options', () => {
+        return init(
+            svg,
+
+            '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="200" baseProfile="full"><rect width="100%" height="100%" fill="red"/><circle cx="150" cy="100" r="80" fill="green"/><text id="a" x="150" y="125" fill="#fff" font-size="60" text-anchor="middle">SVG</text><use x="2" y="2" href="#a"/></svg>',
+
+            { minifySvg: true }
+        );
+    });
+
     // https://github.com/posthtml/htmlnano/issues/88
     it('should work with <svg> with <script> inside (issue #88)', () => {
         return init(
