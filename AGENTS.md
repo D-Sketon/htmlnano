@@ -36,7 +36,7 @@ npm run build && npx mocha --timeout 5000 --require @swc-node/register --recursi
 
 It's IMPORTANT to run `npm run build` first, because the tests use the code from `dist/`.
 If you don't do that, you'll be testing outdated code.
-You can only omit `npm run build` it if you haven't changed the main code, only the tests.
+You can only omit `npm run build` if you haven't changed the main code, only the tests.
 
 
 ## Docs Site Commands (in `docs/`)
