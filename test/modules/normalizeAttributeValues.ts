@@ -1,5 +1,4 @@
 import { init } from '../htmlnano.ts';
-import safePreset from '../../dist/presets/safe.mjs';
 
 describe('normalizeAttributeValues', () => {
     const options = {
@@ -10,7 +9,7 @@ describe('normalizeAttributeValues', () => {
         return init(
             '<form id="FOo" method="GET"></form>',
             '<form id="FOo" method="get"></form>',
-            safePreset
+            options
         );
     });
 
