@@ -3,7 +3,8 @@ import { isConditionalComment } from '../helpers';
 import type { HtmlnanoModule, HtmlnanoOptions, PostHTMLNodeLike, PostHTMLTreeLike } from '../types';
 
 // Spec: https://docs.microsoft.com/en-us/previous-versions/windows/internet-explorer/ie-developer/compatibility/ms537512(v=vs.85)
-const CONDITIONAL_COMMENT_REGEXP = /(<!--\[if\s+?[^<>[\]]+?]>)([\s\S]+?)(<!\[endif\]-->)/gm;
+const CONDITIONAL_COMMENT_HIDDEN_REGEXP = /(<!--\[if\s+?[^<>[\]]+?]>)([\s\S]*?)(<!\[endif\]-->)/gm;
+const CONDITIONAL_COMMENT_REVEALED_REGEXP = /(<!--\[if\s+?[^<>[\]]+?\]><!-->)([\s\S]*?)(<!--<!\[endif\]-->)/gm;
 
 async function minifyConditionalComments(tree: PostHTMLTreeLike, htmlnanoOptions: Partial<HtmlnanoOptions>): Promise<PostHTMLTreeLike>;
 async function minifyConditionalComments(tree: PostHTMLNodeLike[], htmlnanoOptions: Partial<HtmlnanoOptions>): Promise<PostHTMLNodeLike[]>;
@@ -14,7 +15,7 @@ async function minifyConditionalComments(tree: PostHTMLTreeLike | PostHTMLNodeLi
 
         if (typeof node === 'string') {
             if (isConditionalComment(node)) {
-                tree[i] = (await minifycontentInsideConditionalComments(node, htmlnanoOptions)) as PostHTMLNodeLike;
+                tree[i] = (await minifyContentInsideConditionalComments(node, htmlnanoOptions)) as PostHTMLNodeLike;
             }
         } else if (node.content && node.content.length) {
             node.content = await minifyConditionalComments(node.content, htmlnanoOptions);
@@ -31,28 +32,63 @@ const mod: HtmlnanoModule = {
 
 export default mod;
 
-async function minifycontentInsideConditionalComments(text: string, htmlnanoOptions: Partial<HtmlnanoOptions>) {
-    let match;
-    const matches = [];
+type ConditionalCommentMatch = {
+    start: number;
+    end: number;
+    open: string;
+    content: string;
+    close: string;
+};
 
-    // FIXME!
-    // String#matchAll is supported since Node.js 12
-    while ((match = CONDITIONAL_COMMENT_REGEXP.exec(text)) !== null) {
-        matches.push([match[1], match[2], match[3]]);
+function collectConditionalCommentMatches(text: string, regexp: RegExp): ConditionalCommentMatch[] {
+    const matches: ConditionalCommentMatch[] = [];
+    regexp.lastIndex = 0;
+
+    let match: RegExpExecArray | null;
+    while ((match = regexp.exec(text)) !== null) {
+        matches.push({
+            start: match.index,
+            end: match.index + match[0].length,
+            open: match[1],
+            content: match[2],
+            close: match[3]
+        });
     }
+
+    return matches;
+}
+
+function hasHtmlOpeningWithoutClosing(content: string) {
+    return /<html\b/i.test(content) && !/<\/html>/i.test(content);
+}
+
+async function minifyContentInsideConditionalComments(text: string, htmlnanoOptions: Partial<HtmlnanoOptions>) {
+    const matches = [
+        ...collectConditionalCommentMatches(text, CONDITIONAL_COMMENT_HIDDEN_REGEXP),
+        ...collectConditionalCommentMatches(text, CONDITIONAL_COMMENT_REVEALED_REGEXP)
+    ].sort((a, b) => a.start - b.start);
 
     if (!matches.length) {
         return Promise.resolve(text);
     }
 
-    return Promise.all(matches.map(async (match) => {
-        const result = await htmlnano.process(match[1], htmlnanoOptions, {}, {});
-        let minified = result.html;
+    let result = '';
+    let lastIndex = 0;
 
-        if (match[1].includes('<html') && minified.includes('</html>')) {
-            minified = minified.replace('</html>', '');
+    for (const match of matches) {
+        result += text.slice(lastIndex, match.start);
+
+        const processed = await htmlnano.process(match.content, htmlnanoOptions, {}, {});
+        let minified = processed.html;
+
+        if (hasHtmlOpeningWithoutClosing(match.content) && /<\/html>/i.test(minified)) {
+            minified = minified.replace(/<\/html>/i, '');
         }
 
-        return match[0] + minified + match[2];
-    }));
+        result += match.open + minified + match.close;
+        lastIndex = match.end;
+    }
+
+    result += text.slice(lastIndex);
+    return result;
 }

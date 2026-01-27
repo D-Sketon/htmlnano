@@ -55,6 +55,15 @@ describe('minifyConditionalComments', () => {
         <!--[if IE 7]><html class="no-js ie7"><![endif]-->
         <!--[if IE 8]><html class="no-js ie8"><![endif]-->
         <!--[if gt IE 8]><!--><html class="no-js"><!--<![endif]--></html>`,
+        revealedConditionalComment: `
+<!--[if gt IE 8]><!-->
+    <div class="w3c">
+        <span>Text</span>
+    </div>
+<!--<![endif]-->`,
+        revealedConditionalCommentMinified: '<!--[if gt IE 8]><!--><div class="w3c"> <span>Text</span> </div><!--<![endif]-->',
+        multipleConditionalCommentWithText: '<!--[if IE 7]><div> a </div><![endif]-->X<!--[if IE 8]><div> b </div><![endif]-->',
+        multipleConditionalCommentWithTextMinified: '<!--[if IE 7]><div> a </div><![endif]-->X<!--[if IE 8]><div> b </div><![endif]-->',
         emptyConditionalComment: '<!--[if IE 7]><![endif]-->',
         endConditionalComment: '<!--<![endif]-->'
     };
@@ -96,6 +105,28 @@ describe('minifyConditionalComments', () => {
             fixture.htmlTagIncludedConditionalComment,
             fixture.htmlTagIncludedConditionalCommentMinified,
             {
+                minifyConditionalComments: true
+            }
+        );
+    });
+
+    it('downlevel-revealed conditional comment', () => {
+        return init(
+            fixture.revealedConditionalComment,
+            fixture.revealedConditionalCommentMinified,
+            {
+                ...safePresetOptions,
+                minifyConditionalComments: true
+            }
+        );
+    });
+
+    it('multiple conditional comments with text between', () => {
+        return init(
+            fixture.multipleConditionalCommentWithText,
+            fixture.multipleConditionalCommentWithTextMinified,
+            {
+                ...safePresetOptions,
                 minifyConditionalComments: true
             }
         );
