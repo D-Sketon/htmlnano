@@ -40,6 +40,17 @@ describe('mergeStyles', () => {
         );
     });
 
+    it('should merge default and explicit type/media styles', () => {
+        return init(
+            '<style>h1 { color: red }</style>'
+            + '<style type="text/css" media="all">div { color: blue }</style>',
+
+            '<style>h1 { color: red } div { color: blue }</style>',
+
+            options
+        );
+    });
+
     it('should preserve amp-custom', () => {
         return init(
             '<style amp-custom>h1 { color: red }</style>'
@@ -59,6 +70,21 @@ describe('mergeStyles', () => {
                       <style amp-boilerplate="">div { color: blue }</style>`;
         return init(
             html, html, options
+        );
+    });
+
+    it('should ignore amp4ads and amp4email boilerplate', () => {
+        return init(
+            '<style>h1 { color: red }</style>'
+            + '<style amp4ads-boilerplate="">div { color: blue }</style>'
+            + '<style>p { color: green }</style>'
+            + '<style amp4email-boilerplate="">span { color: black }</style>',
+
+            '<style>h1 { color: red } p { color: green }</style>'
+            + '<style amp4ads-boilerplate="">div { color: blue }</style>'
+            + '<style amp4email-boilerplate="">span { color: black }</style>',
+
+            options
         );
     });
 });

@@ -27,6 +27,14 @@ describe('minifyJs', () => {
         );
     });
 
+    it('should minify JS for legacy script types', () => {
+        return init(
+            '<script type="text/ecmascript"> /* test */ var foob = function () {}; </script>',
+            '<script type="text/ecmascript">var foob=function(){};</script>',
+            options
+        );
+    });
+
     it('should not minify JS with <script> + SRI', () => {
         return init(
             `<div>
@@ -60,6 +68,14 @@ describe('minifyJs', () => {
         return init(
             '<a href="#" onclick="return function () {};">click</a>',
             '<a href="#" onclick="return function(){}">click</a>',
+            options
+        );
+    });
+
+    it('should minify JS inside mixed-case on* attributes', () => {
+        return init(
+            '<a href="#" onClick="return function () {};">click</a>',
+            '<a href="#" onClick="return function(){}">click</a>',
             options
         );
     });

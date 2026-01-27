@@ -31,6 +31,14 @@ describe('sortAttributes', () => {
         );
     });
 
+    it('false (disabled)', () => {
+        const html = '<input type="text" name="testInput" class="form-control" id="testId">';
+
+        return init(html, html, {
+            sortAttributes: false
+        });
+    });
+
     it('invalid configuration', () => {
         const input = '<input type="text" class="form-control" name="testInput" autofocus="" autocomplete="off" id="testId">';
 

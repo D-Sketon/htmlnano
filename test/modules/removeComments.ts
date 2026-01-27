@@ -1,4 +1,5 @@
 import { init } from '../htmlnano.ts';
+import type { RemoveCommentsOptions } from '../../src/_modules/removeComments';
 import safePreset from '../../dist/presets/safe.mjs';
 import maxPreset from '../../dist/presets/max.mjs';
 
@@ -52,6 +53,14 @@ describe('removeComments', () => {
             return init(
                 'Lorem ipsum dolor sit amet <!-- more --> consectetur adipiscing elit',
                 'Lorem ipsum dolor sit amet <!-- more --> consectetur adipiscing elit',
+                options
+            );
+        });
+
+        it('should not remove excerpt comments with casing/spacing variations', () => {
+            return init(
+                'Lorem ipsum <!-- MORE --> dolor sit amet',
+                'Lorem ipsum <!-- MORE --> dolor sit amet',
                 options
             );
         });
@@ -124,6 +133,18 @@ describe('removeComments', () => {
                         if (comment.includes('noindex')) return true;
                         return false;
                     }
+                }
+            );
+        });
+    });
+
+    context('invalid option', () => {
+        it('falls back to safe behavior', () => {
+            return init(
+                '<!--noindex-->Keep<!--/noindex--><!-- removed -->',
+                '<!--noindex-->Keep<!--/noindex-->',
+                {
+                    removeComments: 'unknown' as unknown as RemoveCommentsOptions
                 }
             );
         });

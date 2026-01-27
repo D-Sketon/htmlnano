@@ -29,4 +29,20 @@ describe('collapseAttributeWhitespace', () => {
             options
         );
     });
+
+    it('should trim event handler attributes without collapsing inner whitespace', () => {
+        return init(
+            '<button onclick="  foo  bar  ">click</button>',
+            '<button onclick="foo  bar">click</button>',
+            options
+        );
+    });
+
+    it('should not trim single value attributes on unrelated tags', () => {
+        return init(
+            '<div href="  https://example.com  ">click</div>',
+            '<div href="  https://example.com  ">click</div>',
+            options
+        );
+    });
 });

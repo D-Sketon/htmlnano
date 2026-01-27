@@ -21,4 +21,28 @@ describe('removeEmptyAttributes', () => {
             options
         );
     });
+
+    it('should remove empty event handler attributes', () => {
+        return init(
+            '<button onclick="" onfocus="   "></button>',
+            '<button></button>',
+            options
+        );
+    });
+
+    it('should remove empty tag-specific attributes on matching tags', () => {
+        return init(
+            '<textarea cols=""></textarea>',
+            '<textarea></textarea>',
+            options
+        );
+    });
+
+    it('should keep empty tag-specific attributes on non-matching tags', () => {
+        return init(
+            '<div cols=""></div>',
+            '<div cols=""></div>',
+            options
+        );
+    });
 });

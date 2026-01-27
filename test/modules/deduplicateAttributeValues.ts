@@ -21,4 +21,20 @@ describe('deduplicateAttributeValues', () => {
             options
         );
     });
+
+    it('should preserve whitespace around middle duplicates', () => {
+        return init(
+            '<a class="foo  foo   bar">click</a>',
+            '<a class="foo    bar">click</a>',
+            options
+        );
+    });
+
+    it('should deduplicate rel attribute values', () => {
+        return init(
+            '<link rel="nofollow noopener nofollow">',
+            '<link rel="nofollow noopener">',
+            options
+        );
+    });
 });

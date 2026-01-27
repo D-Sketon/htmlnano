@@ -54,7 +54,9 @@ describe('minifyConditionalComments', () => {
         <!--[if lt IE 7]><html class="no-js ie6"><![endif]-->
         <!--[if IE 7]><html class="no-js ie7"><![endif]-->
         <!--[if IE 8]><html class="no-js ie8"><![endif]-->
-        <!--[if gt IE 8]><!--><html class="no-js"><!--<![endif]--></html>`
+        <!--[if gt IE 8]><!--><html class="no-js"><!--<![endif]--></html>`,
+        emptyConditionalComment: '<!--[if IE 7]><![endif]-->',
+        endConditionalComment: '<!--<![endif]-->'
     };
 
     it('common html', () => {
@@ -93,6 +95,26 @@ describe('minifyConditionalComments', () => {
         return init(
             fixture.htmlTagIncludedConditionalComment,
             fixture.htmlTagIncludedConditionalCommentMinified,
+            {
+                minifyConditionalComments: true
+            }
+        );
+    });
+
+    it('empty conditional comment', () => {
+        return init(
+            fixture.emptyConditionalComment,
+            fixture.emptyConditionalComment,
+            {
+                minifyConditionalComments: true
+            }
+        );
+    });
+
+    it('end conditional comment only', () => {
+        return init(
+            fixture.endConditionalComment,
+            fixture.endConditionalComment,
             {
                 minifyConditionalComments: true
             }

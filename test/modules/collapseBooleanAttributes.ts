@@ -23,6 +23,14 @@ describe('collapseBooleanAttributes', () => {
         );
     });
 
+    it('should collapse a boolean attribute with false value', () => {
+        return init(
+            '<input checked="false">',
+            '<input checked>',
+            options
+        );
+    });
+
     // https://html.spec.whatwg.org/#a-quick-introduction-to-html
     // The value, along with the "=" character, can be omitted altogether if the value is the empty string.
     // it('should not collapse non boolean attribute', () => {
@@ -55,6 +63,14 @@ describe('collapseBooleanAttributes', () => {
         return init(
             '<a-entity visible="false"></a-entity>',
             '<a-entity visible="false"></a-entity>',
+            options
+        );
+    });
+
+    it('should not collapse empty A-Frame visible attribute', () => {
+        return init(
+            '<a-entity visible=""></a-entity>',
+            '<a-entity visible=""></a-entity>',
             options
         );
     });

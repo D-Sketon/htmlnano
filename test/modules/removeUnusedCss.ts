@@ -61,6 +61,18 @@ describe('removeUnusedCss (uncss)', function () {
             }
         );
     });
+
+    it('should ignore amp boilerplate styles', () => {
+        const ampHtml = '<style amp-boilerplate="">.unused{color:red}</style><div></div>';
+
+        return init(
+            ampHtml,
+            ampHtml,
+            {
+                removeUnusedCss: maxPreset.removeUnusedCss
+            }
+        );
+    });
 });
 
 describe('removeUnusedCss (purgeCSS)', function () {
@@ -122,6 +134,16 @@ describe('removeUnusedCss (purgeCSS)', function () {
                 removeUnusedCss: maxPreset.removeUnusedCss,
                 minifyCss: {}
             }
+        );
+    });
+
+    it('should keep tag selectors based on the HTML', () => {
+        const tagHtml = '<section><style>section{color:red}.unused{color:blue}</style></section><section>hi</section>';
+
+        return init(
+            tagHtml,
+            '<section><style>section{color:red}</style></section><section>hi</section>',
+            options
         );
     });
 });

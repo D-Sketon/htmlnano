@@ -106,4 +106,20 @@ describe('minifyUrls', () => {
             { ...safePreset, minifyUrls: 'https://example.com/foo/baz/' }
         );
     });
+
+    it('should minify javascript url with mixed case protocol', () => {
+        return init(
+            '<img src="JaVaScRiPt:alert(true)">',
+            '<img src="javascript:alert(!0)">',
+            { ...safePreset, minifyUrls: 'https://example.com/foo/baz/' }
+        );
+    });
+
+    it('should process link imagesrcset', () => {
+        return init(
+            '<link rel="preload" imagesrcset="https://example.com/foo/bar.png 1x, https://example.com/foo/baz.png 2x">',
+            '<link rel="preload" imagesrcset="bar.png 1x, baz.png 2x">',
+            { ...safePreset, minifyUrls: 'https://example.com/foo/' }
+        );
+    });
 });

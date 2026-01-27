@@ -50,6 +50,15 @@ describe('minifyCss', function () {
         );
     });
 
+    it('should not minify style attributes when integrity is present', () => {
+        const html = '<div integrity="example" style="color: #ff0000; margin: 10px 10px 10px 10px"></div>';
+        return init(
+            html,
+            html,
+            options
+        );
+    });
+
     it('should minify CSS inside style attribute', () => {
         return init(
             '<div style="color: #ff0000; margin: 10px 10px 10px 10px"></div>',

@@ -18,6 +18,17 @@ describe('custom', () => {
             { custom: [getRemoveTagFunction('span'), getRemoveTagFunction('span')] }
         );
     });
+
+    it('should ignore falsy custom modules', () => {
+        const customModules = [null, getRemoveTagFunction('span'), false] as unknown as
+            HtmlnanoOptions['custom'];
+
+        return init(
+            '<div><span>hello</span></div>',
+            '<div>hello</div>',
+            { custom: customModules }
+        );
+    });
 });
 
 function getRemoveTagFunction(tag: string) {

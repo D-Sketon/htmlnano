@@ -25,6 +25,19 @@ describe('minifyJson', () => {
         );
     });
 
+    it('should minify JSON with mime parameters', () => {
+        return init(
+            `<script type="application/json; charset=utf-8">
+                {
+                    "test": 7
+                }
+             </script>`,
+
+            '<script type="application/json; charset=utf-8">{"test":7}</script>',
+            options
+        );
+    });
+
     it('should skip JSON inside <script> tags with SRI', () => {
         const fixtures = `<script type="application/json" integrity="example">
                 {

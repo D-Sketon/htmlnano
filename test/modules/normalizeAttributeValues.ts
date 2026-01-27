@@ -39,4 +39,20 @@ describe('normalizeAttributeValues', () => {
             )
         ]);
     });
+
+    it('ignores case-insensitive attrs on other tags', () => {
+        return init(
+            '<a method="POST"></a><form method="POST"></form>',
+            '<a method="POST"></a><form method="post"></form>',
+            options
+        );
+    });
+
+    it('defaults empty values for matching tags', () => {
+        return init(
+            '<img loading="">',
+            '<img loading="eager">',
+            options
+        );
+    });
 });

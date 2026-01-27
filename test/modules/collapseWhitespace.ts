@@ -152,10 +152,32 @@ describe('collapseWhitespace', () => {
             );
         });
 
+        it('trims leading whitespace inside inline elements when prior text ends with space', () => {
+            return init(
+                '<div>before  <span>  text</span></div>',
+                '<div>before <span>text</span></div>',
+                options
+            );
+        });
+
         it('renders the documentation example correctly', () => {
             return init(
                 documentationHtml,
                 '<div>hello world! <a href="#">answer</a><style>div  { color: red; }  </style><main></main></div>',
+                options
+            );
+        });
+    });
+
+    context('invalid option', () => {
+        const options: HtmlnanoOptions = {
+            collapseWhitespace: 'unknown' as HtmlnanoOptions['collapseWhitespace']
+        };
+
+        it('should fall back to conservative behavior', () => {
+            return init(
+                '<div>  foo  </div>',
+                '<div> foo </div>',
                 options
             );
         });

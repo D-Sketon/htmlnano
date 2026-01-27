@@ -152,6 +152,18 @@ describe('removeOptionalTags', () => {
 
             return init(input, expected, options);
         });
+
+        it('first child meta keeps <body>', () => {
+            const input = '<body><meta charset="utf-8"><p>htmlnano</p></body>';
+
+            return init(input, input, options);
+        });
+
+        it('<body> followed by comment keeps tag', () => {
+            const input = '<body><p>htmlnano</p></body><!-- comment -->';
+
+            return init(input, input, options);
+        });
     });
 
     it('html spec example 1', () => {
@@ -243,6 +255,12 @@ describe('removeOptionalTags', () => {
 
         it('empty <tbody>', () => {
             const input = '<tbody></tbody>';
+
+            return init(input, input, options);
+        });
+
+        it('<tbody> preceded by <thead>', () => {
+            const input = '<table><thead></thead><tbody><tr></tr></tbody></table>';
 
             return init(input, input, options);
         });

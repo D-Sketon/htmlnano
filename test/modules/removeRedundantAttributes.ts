@@ -109,4 +109,36 @@ describe('removeRedundantAttributes', () => {
             options
         );
     });
+
+    it('should remove decoding="auto" from <img>', () => {
+        return init(
+            '<img src="example.com" decoding="auto">',
+            '<img src="example.com">',
+            options
+        );
+    });
+
+    it('should remove kind="subtitles" from <track>', () => {
+        return init(
+            '<track kind="subtitles">',
+            '<track>',
+            options
+        );
+    });
+
+    it('should remove wrap="soft" from <textarea>', () => {
+        return init(
+            '<textarea wrap="soft"></textarea>',
+            '<textarea></textarea>',
+            options
+        );
+    });
+
+    it('should remove shape="rect" from <area>', () => {
+        return init(
+            '<area shape="rect" href="example.com">',
+            '<area href="example.com">',
+            options
+        );
+    });
 });
