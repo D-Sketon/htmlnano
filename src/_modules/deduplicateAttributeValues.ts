@@ -1,6 +1,21 @@
 import type { HtmlnanoModule } from '../types';
 import { isListAttribute } from './collapseAttributeWhitespace';
 
+const caseInsensitiveListAttributes = new Set([
+    'rel',
+    'sandbox',
+    'dropzone',
+    'sizes'
+]);
+
+function getDeduplicationKey(attrNameLower: string, attrValue: string) {
+    if (!caseInsensitiveListAttributes.has(attrNameLower)) {
+        return attrValue;
+    }
+
+    return attrValue.toLowerCase();
+}
+
 /** Deduplicate values inside list-like attributes (e.g. class, rel) */
 const mod: HtmlnanoModule = {
     onAttrs() {
@@ -19,7 +34,7 @@ const mod: HtmlnanoModule = {
                 }
 
                 const attrValues = attrs[attrName].split(/\s/);
-                const uniqeAttrValues = new Set();
+                const uniqueAttrValues = new Set<string>();
                 const deduplicatedAttrValues: string[] = [];
 
                 attrValues.forEach((attrValue) => {
@@ -29,12 +44,13 @@ const mod: HtmlnanoModule = {
                         return;
                     }
 
-                    if (uniqeAttrValues.has(attrValue)) {
+                    const deduplicationKey = getDeduplicationKey(attrNameLower, attrValue);
+                    if (uniqueAttrValues.has(deduplicationKey)) {
                         return;
                     }
 
                     deduplicatedAttrValues.push(attrValue);
-                    uniqeAttrValues.add(attrValue);
+                    uniqueAttrValues.add(deduplicationKey);
                 });
 
                 newAttrs[attrName] = deduplicatedAttrValues.join(' ');

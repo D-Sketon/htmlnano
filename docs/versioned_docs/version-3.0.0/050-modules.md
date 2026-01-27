@@ -140,7 +140,7 @@ Minified:
 ```
 
 ### deduplicateAttributeValues
-Remove duplicate values from list-like attributes (`class`, `rel`, `ping`).
+Remove duplicate values from list-like attributes (`class`, `rel`, `ping`, `sandbox`, `dropzone`, `sizes` on `link`, `headers`). For case-insensitive token lists (`rel`, `sandbox`, `dropzone`, `sizes`), duplicates are removed regardless of casing (first occurrence kept).
 
 #### Example
 Source:

@@ -37,4 +37,20 @@ describe('deduplicateAttributeValues', () => {
             options
         );
     });
+
+    it('should deduplicate rel values case-insensitively', () => {
+        return init(
+            '<link rel="nofollow NoFoLlOw">',
+            '<link rel="nofollow">',
+            options
+        );
+    });
+
+    it('should deduplicate sandbox values case-insensitively', () => {
+        return init(
+            '<iframe sandbox="ALLOW-SCRIPTS allow-scripts allow-forms"></iframe>',
+            '<iframe sandbox="ALLOW-SCRIPTS allow-forms"></iframe>',
+            options
+        );
+    });
 });
