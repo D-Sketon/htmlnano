@@ -83,4 +83,32 @@ describe('mergeScripts', () => {
             options
         );
     });
+
+    it('should keep async scripts separate from sync scripts', () => {
+        return init(
+            `<script>window.foo1 = 'foo'</script>
+            <script async>window.async = true</script>
+            <script>window.foo2 = 'bar'</script>`,
+
+            `
+            <script async>window.async = true</script>
+            <script>window.foo1 = 'foo';window.foo2 = 'bar'</script>`,
+
+            options
+        );
+    });
+
+    it('should merge application/javascript scripts separately', () => {
+        return init(
+            `<script type="application/javascript">window.foo1 = 'foo'</script>
+            <script>window.bar = 'bar'</script>
+            <script type="application/javascript">window.foo2 = 'baz'</script>`,
+
+            `
+            <script>window.bar = 'bar'</script>
+            <script type="application/javascript">window.foo1 = 'foo';window.foo2 = 'baz'</script>`,
+
+            options
+        );
+    });
 });
