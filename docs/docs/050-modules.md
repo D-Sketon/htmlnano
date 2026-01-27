@@ -9,8 +9,8 @@ The order in which the modules are documented is also the order in which they ar
 
 ### normalizeAttributeValues
 
-- Normalize casing of specific attribute values that are case-insensitive (like `form[method]`, `img[img]` and `input[type]`).
-- Apply [invalid value default](https://html.spec.whatwg.org/#invalid-value-default) attribute to invalid attribute values (like `<input type=foo>` to `<input type=text>`, which can then be minified to `<input>` by `removeRedundantAttributes` module).
+- Normalize casing of specific attribute values that are case-insensitive (like `form[method]`, `img[crossorigin]` and `input[type]`).
+- Trim surrounding whitespace for normalized values, and apply [invalid value default](https://html.spec.whatwg.org/#invalid-value-default) attribute to invalid attribute values (like `<input type=foo>` to `<input type=text>`, which can then be minified to `<input>` by `removeRedundantAttributes` module).
 #### Example
 
 Source:

@@ -54,4 +54,29 @@ describe('normalizeAttributeValues', () => {
             options
         );
     });
+
+    it('normalizes casing and whitespace for invalid defaults', () => {
+        return Promise.all([
+            init(
+                '<img loading="LAZY">',
+                '<img loading="lazy">',
+                options
+            ),
+            init(
+                '<img loading="  LAZY  ">',
+                '<img loading="lazy">',
+                options
+            ),
+            init(
+                '<a referrerpolicy="NO-REFERRER"></a>',
+                '<a referrerpolicy="no-referrer"></a>',
+                options
+            ),
+            init(
+                '<form method="  GET  "></form>',
+                '<form method="get"></form>',
+                options
+            )
+        ]);
+    });
 });

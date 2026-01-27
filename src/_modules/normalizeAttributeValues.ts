@@ -112,25 +112,26 @@ const mod: HtmlnanoModule = {
 
             Object.entries(attrs).forEach(([attrName, attrValue]) => {
                 let newAttrValue = attrValue;
-
-                if (
-                    Object.hasOwnProperty.call(caseInsensitiveAttributes, attrName)
+                const hasCaseInsensitive = Object.hasOwnProperty.call(caseInsensitiveAttributes, attrName)
                     && (
                         caseInsensitiveAttributes[attrName] === null
                         || (node.tag && caseInsensitiveAttributes[attrName].includes(node.tag))
-                    )
-                ) {
-                    newAttrValue = typeof attrValue === 'string' ? attrValue.toLowerCase() : attrValue;
+                    );
+                const hasInvalidValueDefault = Object.hasOwnProperty.call(invalidValueDefault, attrName);
+                const invalidMeta = hasInvalidValueDefault ? invalidValueDefault[attrName] : undefined;
+                const appliesInvalidValueDefault = Boolean(
+                    invalidMeta
+                    && (invalidMeta.tag === null || (node && node.tag && invalidMeta.tag.includes(node.tag)))
+                );
+                const shouldNormalizeCase = hasCaseInsensitive || appliesInvalidValueDefault;
+
+                if (typeof attrValue === 'string' && shouldNormalizeCase) {
+                    newAttrValue = attrValue.trim().toLowerCase();
                 }
 
-                if (
-                    Object.hasOwnProperty.call(invalidValueDefault, attrName)
-                ) {
-                    const meta = invalidValueDefault[attrName];
-                    if (meta.tag === null || (node && node.tag && meta.tag.includes(node.tag))) {
-                        if (typeof newAttrValue !== 'string' || !meta.valid.includes(newAttrValue)) {
-                            newAttrValue = meta.default;
-                        }
+                if (appliesInvalidValueDefault && invalidMeta) {
+                    if (typeof newAttrValue !== 'string' || !invalidMeta.valid.includes(newAttrValue)) {
+                        newAttrValue = invalidMeta.default;
                     }
                 }
 
