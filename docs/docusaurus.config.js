@@ -7,7 +7,7 @@ module.exports = {
     title: 'htmlnano',
     tagline: 'Modular HTML minifier',
     url: 'https://htmlnano.netlify.app',
-    favicon: 'favicon.ico',
+    favicon: 'logo.png',
     baseUrl: '/',
     onBrokenLinks: 'throw',
     markdown: {
@@ -20,8 +20,13 @@ module.exports = {
     trailingSlash: false,
     plugins: ['docusaurus-plugin-goatcounter'],
     themeConfig: {
+        image: 'logo.png',
         navbar: {
             title: 'htmlnano',
+            logo: {
+                alt: 'htmlnano logo',
+                src: 'logo.png'
+            },
             items: [
                 {
                     type: 'docsVersionDropdown',
