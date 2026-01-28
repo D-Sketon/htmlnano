@@ -4,40 +4,57 @@
 npm install htmlnano
 ```
 
-## Javascript
+## JavaScript API
+
+### ESM
+```js
+import htmlnano, { presets } from 'htmlnano';
+
+const options = {
+    removeEmptyAttributes: false,
+    collapseWhitespace: 'conservative'
+};
+
+// See PostHTML docs
+const postHtmlOptions = {
+    sync: true,
+    lowerCaseTags: true,
+    quoteAllAttributes: false
+};
+
+// "preset" arg might be skipped (see "Presets" section below for more info)
+// "postHtmlOptions" arg might be skipped
+const result = await htmlnano.process(html, options, presets.safe, postHtmlOptions);
+// result.html is minified
+```
+
+### CommonJS
 ```js
 const htmlnano = require('htmlnano');
+
 const options = {
-    removeEmptyAttributes: false, // Disable the module "removeEmptyAttributes"
-    collapseWhitespace: 'conservative' // Pass options to the module "collapseWhitespace"
-};
-// posthtml, posthtml-render, and posthtml-parse options
-const postHtmlOptions = {
-    sync: true, // https://github.com/posthtml/posthtml#usage
-    lowerCaseTags: true, // https://github.com/posthtml/posthtml-parser#options
-    quoteAllAttributes: false, // https://github.com/posthtml/posthtml-render#options
+    removeEmptyAttributes: false,
+    collapseWhitespace: 'conservative'
 };
 
 htmlnano
-    // "preset" arg might be skipped (see "Presets" section below for more info)
-    // "postHtmlOptions" arg might be skipped
-    .process(html, options, preset, postHtmlOptions)
-    .then(function (result) {
+    .process(html, options)
+    .then((result) => {
         // result.html is minified
     })
-    .catch(function (err) {
+    .catch((err) => {
         console.error(err);
     });
 ```
 
 
 ## PostHTML
-Just add `htmlnano` as a final plugin:
+Add `htmlnano` as a final plugin:
 ```js
 const posthtml = require('posthtml');
 const options = {
-    removeComments: false, // Disable the module "removeComments"
-    collapseWhitespace: 'conservative' // Pass options to the module "collapseWhitespace"
+    removeComments: false,
+    collapseWhitespace: 'conservative'
 };
 const posthtmlPlugins = [
     /* other PostHTML plugins */
@@ -51,10 +68,10 @@ const posthtmlOptions = {
 
 posthtml(posthtmlPlugins)
     .process(html, posthtmlOptions)
-    .then(function (result) {
+    .then((result) => {
         // result.html is minified
     })
-    .catch(function (err) {
+    .catch((err) => {
         console.error(err);
     });
 ```
@@ -64,14 +81,14 @@ posthtml(posthtmlPlugins)
 You can use `htmlnano` as a CLI tool:
 
 ```bash
-node_modules/.bin/htmlnano --help
+npx htmlnano --help
 ```
 
 The options can be passed via the configuration file:
 
 ```bash
 echo '{"collapseWhitespace": "all", "removeComments": "all"}' > config.json
-node_modules/.bin/htmlnano test.html -c config.json
+npx htmlnano test.html -c config.json
 ```
 
 
@@ -90,21 +107,21 @@ module.exports = {
     optimization: {
         minimize: true,
         minimizer: [
-            // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
-            // `...`,
-            new HtmlMinimizerWebpackPlugin({
-                // Add HtmlMinimizerWebpackPlugin's option here, see https://webpack.js.org/plugins/html-minimizer-webpack-plugin/#options
-                // test: /\.html(\?.*)?$/i,
+                // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`).
+                // `...`,
+                new HtmlMinimizerWebpackPlugin({
+                    // Add HtmlMinimizerWebpackPlugin options here.
+                    // test: /\.html(\?.*)?$/i,
 
-                // Use htmlnano as HtmlMinimizerWebpackPlugin's minimizer
-                minify: htmlnano.htmlMinimizerWebpackPluginMinify,
-                minimizerOptions: {
-                    // Add htmlnano's option here
-                    removeComments: false, // Disable the module "removeComments"
-                    collapseWhitespace: 'conservative' // Pass options to the module "collapseWhitespace"
-                }
-            })
-        ]
+                    // Use htmlnano as HtmlMinimizerWebpackPlugin's minimizer.
+                    minify: htmlnano.htmlMinimizerWebpackPluginMinify,
+                    minimizerOptions: {
+                        // Add htmlnano options here.
+                        removeComments: false,
+                        collapseWhitespace: 'conservative'
+                    }
+                })
+            ]
     }
 }
 ```
@@ -121,10 +138,10 @@ const gulp = require('gulp');
 const posthtml = require('gulp-posthtml');
 const htmlnano = require('htmlnano');
 const options = {
-    removeComments: false
+  removeComments: false
 };
 
-gulp.task('default', function() {
+gulp.task('default', function () {
     return gulp
         .src('./index.html')
         .pipe(posthtml([

@@ -1,16 +1,16 @@
 # Contribute
 
-Since the minifier is modular, it's very easy to add new modules:
+Since the minifier is modular, it's easy to add new modules:
 
-1. Create a ES6-file inside `lib/modules/` with a function that does some minification. For example you can check [`src/_modules/example.ts`](https://github.com/posthtml/htmlnano/blob/master/src/_modules/example.ts).
+1. Create a file inside `src/_modules/` with a module that performs one minification task. For a template, check [`src/_modules/example.ts`](https://github.com/posthtml/htmlnano/blob/master/src/_modules/example.ts).
 
-2. Add the module's name into one of those [presets](https://github.com/posthtml/htmlnano/tree/master/src/presets). You can choose either `ampSafe`, `max`, or `safe`.
+2. Add the module to one or more presets in [`src/presets/`](https://github.com/posthtml/htmlnano/tree/master/src/presets). Use `safe`, `ampSafe`, and/or `max` based on risk.
 
-3. Create a JS-file inside `test/modules/` with some unit-tests.
+3. Add unit tests in `test/modules/` (TypeScript).
 
-4. Describe your module in the section "[Modules](https://github.com/posthtml/htmlnano/blob/master/README.md#modules)".
+4. Document the module in `docs/docs/050-modules.md`.
 
-5. Send me a pull request.
+5. Run `npm run lint` and `npm run build`, then open a pull request.
 
-Other types of contribution (bug fixes, documentation improves, etc) are also welcome!
+Other types of contribution (bug fixes, documentation improvements, etc.) are also welcome.
 Would like to contribute, but don't have any ideas what to do? Check out [our issues](https://github.com/posthtml/htmlnano/labels/help%20wanted).

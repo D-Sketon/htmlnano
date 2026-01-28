@@ -3,30 +3,35 @@
 A preset is just an object with modules config.
 
 Currently the following presets are available:
-- [safe](https://github.com/posthtml/htmlnano/blob/master/src/presets/safe.ts) — a default preset for minifying a regular HTML in a safe way (without breaking anything)
-- [ampSafe](https://github.com/posthtml/htmlnano/blob/master/src/presets/ampSafe.ts) - same as `safe` preset but for [AMP pages](https://www.ampproject.org/)
-- [max](https://github.com/posthtml/htmlnano/blob/master/src/presets/max.ts) - maximal minification (might break some pages)
+- [safe](https://github.com/posthtml/htmlnano/blob/master/src/presets/safe.ts) — default preset for safe minification.
+- [ampSafe](https://github.com/posthtml/htmlnano/blob/master/src/presets/ampSafe.ts) — same as `safe` but tailored for [AMP pages](https://www.ampproject.org/).
+- [max](https://github.com/posthtml/htmlnano/blob/master/src/presets/max.ts) — maximal minification (might break some pages).
 
 
 You can use them the following way:
 ```js
 const htmlnano = require('htmlnano');
 const ampSafePreset = require('htmlnano').presets.ampSafe;
-const options = {
-    // Your options
-};
 
-htmlnano
-    .process(html, options, ampSafePreset)
-    .then(function (result) {
+htmlnano.process(html, { collapseWhitespace: 'conservative' }, ampSafePreset)
+    .then((result) => {
         // result.html is minified
     })
-    .catch(function (err) {
+    .catch((err) => {
         console.error(err);
     });
 ```
 
-If you skip `preset` argument [`safe`](https://github.com/posthtml/htmlnano/blob/master/src/presets/safe.ts) preset would be used by default.
+You can also import presets directly:
+
+```js
+import htmlnano from 'htmlnano';
+import ampSafe from 'htmlnano/presets/ampSafe';
+
+const result = await htmlnano.process(html, {}, ampSafe);
+```
+
+If you skip `preset` argument, [`safe`](https://github.com/posthtml/htmlnano/blob/master/src/presets/safe.ts) is used by default.
 
 
 If you'd like to define your very own config without any presets pass an empty object as a preset:
@@ -47,27 +52,22 @@ htmlnano
 ```
 
 
-You might create also your own presets:
+You might create your own presets by starting from a built-in one:
 ```js
 const htmlnano = require('htmlnano');
-// Preset for minifying email templates
 const emailPreset = {
+    ...htmlnano.presets.safe,
     mergeStyles: true,
     minifyCss: {
         safe: true
-    },
+    }
 };
 
-const options = {
-    // Some specific options
-};
-
-htmlnano
-    .process(html, options, emailPreset)
-    .then(function (result) {
+htmlnano.process(html, { removeComments: false }, emailPreset)
+    .then((result) => {
         // result.html is minified
     })
-    .catch(function (err) {
+    .catch((err) => {
         console.error(err);
     });
 ```
