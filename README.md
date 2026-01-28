@@ -1,4 +1,4 @@
-<h1><img src="docs/static/logo.png" alt="htmlnano logo" width="70" align="absmiddle">&nbsp;htmlnano</h1>
+<h1><img src="docs/static/logo.png" alt="htmlnano logo" width="90" align="absmiddle">&nbsp;htmlnano</h1>
 
 [![npm version](https://badge.fury.io/js/htmlnano.svg)](http://badge.fury.io/js/htmlnano)
 ![CI](https://github.com/maltsev/htmlnano/actions/workflows/ci.yml/badge.svg)
