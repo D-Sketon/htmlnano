@@ -8,7 +8,7 @@ export const attributesWithLists = new Map<string, Set<string>>([
     ['ping', new Set()], // a, area
     ['sandbox', new Set()], // iframe
     /**
-     * https://github.com/posthtml/htmlnano/issues/180
+     * https://github.com/maltsev/htmlnano/issues/180
      * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/link#attr-sizes
      *
      * "sizes" of <img> should not be modified, while "sizes" of <link> is a list of tokens.

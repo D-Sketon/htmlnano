@@ -241,7 +241,7 @@ describe('removeOptionalTags', () => {
     </body>
 </html>`;
         // </body> just can't be reomved simply because posthtml can't do this.
-        // See https://github.com/posthtml/htmlnano/issues/99
+        // See https://github.com/maltsev/htmlnano/issues/99
         const expected = `
 <!DOCTYPE HTML>
 
@@ -401,7 +401,7 @@ describe('removeOptionalTags', () => {
  </tbody>
 </table>`;
         // </caption>, </thead>, </th>, </td> and </tr> just can't be reomved simply because posthtml can't do this.
-        // See https://github.com/posthtml/htmlnano/issues/99
+        // See https://github.com/maltsev/htmlnano/issues/99
         const expected = `
 <table>
  <caption>37547 TEE Electric Powered Rail Car Train Functions (Abbreviated)</caption>

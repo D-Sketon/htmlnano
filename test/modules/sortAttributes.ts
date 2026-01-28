@@ -58,7 +58,7 @@ describe('sortAttributes', () => {
         );
     });
 
-    // https://github.com/posthtml/htmlnano/issues/189
+    // https://github.com/maltsev/htmlnano/issues/189
     it('issue #189', () => {
         return init(
             '<input id="name" name="name" autocomplete="name" type="text" required="">',

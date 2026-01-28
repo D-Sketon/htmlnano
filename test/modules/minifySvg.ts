@@ -95,7 +95,7 @@ describe('minifySvg', () => {
         );
     });
 
-    // https://github.com/posthtml/htmlnano/issues/88
+    // https://github.com/maltsev/htmlnano/issues/88
     it('should work with <svg> with <script> inside (issue #88)', () => {
         return init(
             svgContainsCDATA,
@@ -112,7 +112,7 @@ describe('minifySvg', () => {
         );
     });
 
-    // https://github.com/posthtml/htmlnano/issues/129
+    // https://github.com/maltsev/htmlnano/issues/129
     it('should work with <foreignObject>', () => {
         return init(
             svgContainsForeignObject,
@@ -121,7 +121,7 @@ describe('minifySvg', () => {
         );
     });
 
-    // https://github.com/posthtml/htmlnano/issues/197
+    // https://github.com/maltsev/htmlnano/issues/197
     it('shouldn\'t choke on svg errors', () => {
         const input = `
         <!doctype html>

@@ -105,7 +105,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 *The major version has to be released because of vulnerability in PostCSS (see [#165])*
 
 ### Changed
-- Support optional dependencies [#168] (`minifyUrl`, ` minifyJs`, `removeUnusedCss`, `minifyCss`). *This might be a breaking change for you*. Check the docs: https://github.com/posthtml/htmlnano/pull/168/files
+- Support optional dependencies [#168] (`minifyUrl`, ` minifyJs`, `removeUnusedCss`, `minifyCss`). *This might be a breaking change for you*. Check the docs: https://github.com/maltsev/htmlnano/pull/168/files
 - Disable `mergeScripts` & `mergeStyles` in the safe preset [#170].
 
 
@@ -139,9 +139,9 @@ This version fixes fatal errors introduced in [1.1.0].
 
 
 ## [1.0.0] - 2021-04-17
-After more than 4 years of development, it's time to release a stable [1.0.0](https://github.com/posthtml/htmlnano/releases/tag/1.0.0) version 🎉
+After more than 4 years of development, it's time to release a stable [1.0.0](https://github.com/maltsev/htmlnano/releases/tag/1.0.0) version 🎉
 
-It doesn't contain anything new from the previous [0.2.9](https://github.com/posthtml/htmlnano/releases/tag/0.2.9) release.
+It doesn't contain anything new from the previous [0.2.9](https://github.com/maltsev/htmlnano/releases/tag/0.2.9) release.
 We just did a major upgrade of two dependencies: [PurgeCSS](https://purgecss.com/) and [SVGO](https://github.com/svg/svgo),
 which changed their config format.
 Thus we have to do a major release of `htmlnano`.
@@ -168,10 +168,10 @@ Otherwise, you have to adapt the config according to the new [PurgeCSS@3](https:
 
 ## [0.2.8] - 2020-11-15
 ### Added
-- [`removeOptionalTags`](https://github.com/posthtml/htmlnano#removeoptionaltags) [#110].
-- [`sortAttributes`](https://github.com/posthtml/htmlnano#removeoptionaltags) [#113].
+- [`removeOptionalTags`](https://github.com/maltsev/htmlnano#removeoptionaltags) [#110].
+- [`sortAttributes`](https://github.com/maltsev/htmlnano#removeoptionaltags) [#113].
 - `source[src]` and `srcset` support to `minifyUrls` [#117].
-- [`minifyConditionalComments`](https://github.com/posthtml/htmlnano#minifyconditionalcomments) [#119].
+- [`minifyConditionalComments`](https://github.com/maltsev/htmlnano#minifyconditionalcomments) [#119].
 
 ### Changed
 - Sort by frequency `sortAttributesWithLists` [#111].
@@ -240,9 +240,9 @@ Otherwise, you have to adapt the config according to the new [PurgeCSS@3](https:
 ## [0.2.0] - 2018-09-14
 ### Breaking changes
 - The API of `minifyCss` module has been changed since `cssnano` has been updated to version 4, which has a different API. Check the following resources for more info:
-  * [htmlnano docs](https://github.com/posthtml/htmlnano#minifycss)
+  * [htmlnano docs](https://github.com/maltsev/htmlnano#minifycss)
   * [cssnano docs](https://cssnano.co/guides/presets)
-  * Diff of commit [979f2c](https://github.com/posthtml/htmlnano/commit/979f2c821892c9e979e8b85f74ed0394330fceaf) with the changes of related docs.
+  * Diff of commit [979f2c](https://github.com/maltsev/htmlnano/commit/979f2c821892c9e979e8b85f74ed0394330fceaf) with the changes of related docs.
 
 ### Added
 - Add presets [#64].
@@ -331,120 +331,120 @@ Otherwise, you have to adapt the config according to the new [PurgeCSS@3](https:
 - Remove attributes that contains only white spaces.
 
 
-[3.0.0]: https://github.com/posthtml/htmlnano/compare/2.1.5...3.0.0
-[2.1.5]: https://github.com/posthtml/htmlnano/compare/2.1.4...2.1.5
-[2.1.4]: https://github.com/posthtml/htmlnano/compare/2.1.3...2.1.4
-[2.1.3]: https://github.com/posthtml/htmlnano/compare/2.1.2...2.1.3
-[2.1.2]: https://github.com/posthtml/htmlnano/compare/2.1.1...2.1.2
-[2.1.1]: https://github.com/posthtml/htmlnano/compare/2.1.0...2.1.1
-[2.1.0]: https://github.com/posthtml/htmlnano/compare/2.0.4...2.1.0
-[2.0.4]: https://github.com/posthtml/htmlnano/compare/2.0.3...2.0.4
-[2.0.3]: https://github.com/posthtml/htmlnano/compare/2.0.2...2.0.3
-[2.0.2]: https://github.com/posthtml/htmlnano/compare/2.0.1...2.0.2
-[2.0.1]: https://github.com/posthtml/htmlnano/compare/2.0.0...2.0.1
-[2.0.0]: https://github.com/posthtml/htmlnano/compare/1.1.1...2.0.0
-[1.1.1]: https://github.com/posthtml/htmlnano/compare/1.1.0...1.1.1
-[1.1.0]: https://github.com/posthtml/htmlnano/compare/1.0.1...1.1.0
-[1.0.1]: https://github.com/posthtml/htmlnano/compare/1.0.0...1.0.1
-[1.0.0]: https://github.com/posthtml/htmlnano/compare/0.2.9...1.0.0
-[0.2.9]: https://github.com/posthtml/htmlnano/compare/0.2.8...0.2.9
-[0.2.8]: https://github.com/posthtml/htmlnano/compare/0.2.7...0.2.8
-[0.2.7]: https://github.com/posthtml/htmlnano/compare/0.2.6...0.2.7
-[0.2.6]: https://github.com/posthtml/htmlnano/compare/0.2.5...0.2.6
-[0.2.5]: https://github.com/posthtml/htmlnano/compare/0.2.4...0.2.5
-[0.2.4]: https://github.com/posthtml/htmlnano/compare/0.2.3...0.2.4
-[0.2.3]: https://github.com/posthtml/htmlnano/compare/0.2.2...0.2.3
-[0.2.2]: https://github.com/posthtml/htmlnano/compare/0.2.1...0.2.2
-[0.2.1]: https://github.com/posthtml/htmlnano/compare/0.2.0...0.2.1
-[0.2.0]: https://github.com/posthtml/htmlnano/compare/0.1.10...0.2.0
-[0.1.10]: https://github.com/posthtml/htmlnano/compare/0.1.9...0.1.10
-[0.1.9]: https://github.com/posthtml/htmlnano/compare/0.1.8...0.1.9
-[0.1.8]: https://github.com/posthtml/htmlnano/compare/0.1.7...0.1.8
-[0.1.7]: https://github.com/posthtml/htmlnano/compare/0.1.6...0.1.7
-[0.1.6]: https://github.com/posthtml/htmlnano/compare/0.1.5...0.1.6
-[0.1.5]: https://github.com/posthtml/htmlnano/compare/0.1.4...0.1.5
-[0.1.4]: https://github.com/posthtml/htmlnano/compare/0.1.3...0.1.4
-[0.1.3]: https://github.com/posthtml/htmlnano/compare/0.1.2...0.1.3
-[0.1.2]: https://github.com/posthtml/htmlnano/compare/0.1.1...0.1.2
-[0.1.1]: https://github.com/posthtml/htmlnano/compare/0.1.0...0.1.1
+[3.0.0]: https://github.com/maltsev/htmlnano/compare/2.1.5...3.0.0
+[2.1.5]: https://github.com/maltsev/htmlnano/compare/2.1.4...2.1.5
+[2.1.4]: https://github.com/maltsev/htmlnano/compare/2.1.3...2.1.4
+[2.1.3]: https://github.com/maltsev/htmlnano/compare/2.1.2...2.1.3
+[2.1.2]: https://github.com/maltsev/htmlnano/compare/2.1.1...2.1.2
+[2.1.1]: https://github.com/maltsev/htmlnano/compare/2.1.0...2.1.1
+[2.1.0]: https://github.com/maltsev/htmlnano/compare/2.0.4...2.1.0
+[2.0.4]: https://github.com/maltsev/htmlnano/compare/2.0.3...2.0.4
+[2.0.3]: https://github.com/maltsev/htmlnano/compare/2.0.2...2.0.3
+[2.0.2]: https://github.com/maltsev/htmlnano/compare/2.0.1...2.0.2
+[2.0.1]: https://github.com/maltsev/htmlnano/compare/2.0.0...2.0.1
+[2.0.0]: https://github.com/maltsev/htmlnano/compare/1.1.1...2.0.0
+[1.1.1]: https://github.com/maltsev/htmlnano/compare/1.1.0...1.1.1
+[1.1.0]: https://github.com/maltsev/htmlnano/compare/1.0.1...1.1.0
+[1.0.1]: https://github.com/maltsev/htmlnano/compare/1.0.0...1.0.1
+[1.0.0]: https://github.com/maltsev/htmlnano/compare/0.2.9...1.0.0
+[0.2.9]: https://github.com/maltsev/htmlnano/compare/0.2.8...0.2.9
+[0.2.8]: https://github.com/maltsev/htmlnano/compare/0.2.7...0.2.8
+[0.2.7]: https://github.com/maltsev/htmlnano/compare/0.2.6...0.2.7
+[0.2.6]: https://github.com/maltsev/htmlnano/compare/0.2.5...0.2.6
+[0.2.5]: https://github.com/maltsev/htmlnano/compare/0.2.4...0.2.5
+[0.2.4]: https://github.com/maltsev/htmlnano/compare/0.2.3...0.2.4
+[0.2.3]: https://github.com/maltsev/htmlnano/compare/0.2.2...0.2.3
+[0.2.2]: https://github.com/maltsev/htmlnano/compare/0.2.1...0.2.2
+[0.2.1]: https://github.com/maltsev/htmlnano/compare/0.2.0...0.2.1
+[0.2.0]: https://github.com/maltsev/htmlnano/compare/0.1.10...0.2.0
+[0.1.10]: https://github.com/maltsev/htmlnano/compare/0.1.9...0.1.10
+[0.1.9]: https://github.com/maltsev/htmlnano/compare/0.1.8...0.1.9
+[0.1.8]: https://github.com/maltsev/htmlnano/compare/0.1.7...0.1.8
+[0.1.7]: https://github.com/maltsev/htmlnano/compare/0.1.6...0.1.7
+[0.1.6]: https://github.com/maltsev/htmlnano/compare/0.1.5...0.1.6
+[0.1.5]: https://github.com/maltsev/htmlnano/compare/0.1.4...0.1.5
+[0.1.4]: https://github.com/maltsev/htmlnano/compare/0.1.3...0.1.4
+[0.1.3]: https://github.com/maltsev/htmlnano/compare/0.1.2...0.1.3
+[0.1.2]: https://github.com/maltsev/htmlnano/compare/0.1.1...0.1.2
+[0.1.1]: https://github.com/maltsev/htmlnano/compare/0.1.0...0.1.1
 
-[#373]: https://github.com/posthtml/htmlnano/issues/373
-[#342]: https://github.com/posthtml/htmlnano/issues/342
-[#336]: https://github.com/posthtml/htmlnano/issues/336
-[#328]: https://github.com/posthtml/htmlnano/issues/328
-[#293]: https://github.com/posthtml/htmlnano/issues/293
-[#278]: https://github.com/posthtml/htmlnano/issues/278
-[#260]: https://github.com/posthtml/htmlnano/issues/260
-[#257]: https://github.com/posthtml/htmlnano/issues/257
-[#220]: https://github.com/posthtml/htmlnano/issues/220
-[#197]: https://github.com/posthtml/htmlnano/issues/197
-[#195]: https://github.com/posthtml/htmlnano/issues/195
-[#185]: https://github.com/posthtml/htmlnano/issues/185
-[#184]: https://github.com/posthtml/htmlnano/issues/184
-[#182]: https://github.com/posthtml/htmlnano/issues/182
-[#180]: https://github.com/posthtml/htmlnano/issues/180
-[#170]: https://github.com/posthtml/htmlnano/issues/170
-[#168]: https://github.com/posthtml/htmlnano/issues/168
-[#165]: https://github.com/posthtml/htmlnano/issues/165
-[#163]: https://github.com/posthtml/htmlnano/issues/163
-[#161]: https://github.com/posthtml/htmlnano/issues/161
-[#159]: https://github.com/posthtml/htmlnano/issues/159
-[#158]: https://github.com/posthtml/htmlnano/issues/158
-[#157]: https://github.com/posthtml/htmlnano/issues/157
-[#156]: https://github.com/posthtml/htmlnano/issues/156
-[#154]: https://github.com/posthtml/htmlnano/issues/154
-[#153]: https://github.com/posthtml/htmlnano/issues/153
-[#145]: https://github.com/posthtml/htmlnano/issues/145
-[#135]: https://github.com/posthtml/htmlnano/issues/135
-[#129]: https://github.com/posthtml/htmlnano/issues/129
-[#127]: https://github.com/posthtml/htmlnano/issues/127
-[#125]: https://github.com/posthtml/htmlnano/issues/125
-[#122]: https://github.com/posthtml/htmlnano/issues/122
-[#120]: https://github.com/posthtml/htmlnano/issues/120
-[#119]: https://github.com/posthtml/htmlnano/issues/119
-[#117]: https://github.com/posthtml/htmlnano/issues/117
-[#116]: https://github.com/posthtml/htmlnano/issues/116
-[#114]: https://github.com/posthtml/htmlnano/issues/114
-[#113]: https://github.com/posthtml/htmlnano/issues/113
-[#112]: https://github.com/posthtml/htmlnano/issues/112
-[#111]: https://github.com/posthtml/htmlnano/issues/111
-[#110]: https://github.com/posthtml/htmlnano/issues/110
-[#108]: https://github.com/posthtml/htmlnano/issues/108
-[#107]: https://github.com/posthtml/htmlnano/issues/107
-[#104]: https://github.com/posthtml/htmlnano/issues/104
-[#102]: https://github.com/posthtml/htmlnano/issues/102
-[#98]: https://github.com/posthtml/htmlnano/issues/98
-[#95]: https://github.com/posthtml/htmlnano/issues/95
-[#94]: https://github.com/posthtml/htmlnano/issues/94
-[#90]: https://github.com/posthtml/htmlnano/issues/90
-[#88]: https://github.com/posthtml/htmlnano/issues/88
-[#84]: https://github.com/posthtml/htmlnano/issues/84
-[#80]: https://github.com/posthtml/htmlnano/issues/80
-[#79]: https://github.com/posthtml/htmlnano/issues/79
-[#78]: https://github.com/posthtml/htmlnano/issues/78
-[#76]: https://github.com/posthtml/htmlnano/issues/76
-[#71]: https://github.com/posthtml/htmlnano/issues/71
-[#67]: https://github.com/posthtml/htmlnano/issues/67
-[#66]: https://github.com/posthtml/htmlnano/issues/66
-[#65]: https://github.com/posthtml/htmlnano/issues/65
-[#64]: https://github.com/posthtml/htmlnano/issues/64
-[#62]: https://github.com/posthtml/htmlnano/issues/62
-[#59]: https://github.com/posthtml/htmlnano/issues/59
-[#55]: https://github.com/posthtml/htmlnano/issues/55
-[#50]: https://github.com/posthtml/htmlnano/issues/50
-[#48]: https://github.com/posthtml/htmlnano/issues/48
-[#47]: https://github.com/posthtml/htmlnano/issues/47
-[#42]: https://github.com/posthtml/htmlnano/issues/42
-[#39]: https://github.com/posthtml/htmlnano/issues/39
-[#36]: https://github.com/posthtml/htmlnano/issues/36
-[#31]: https://github.com/posthtml/htmlnano/issues/31
-[#30]: https://github.com/posthtml/htmlnano/issues/30
-[#28]: https://github.com/posthtml/htmlnano/issues/28
-[#25]: https://github.com/posthtml/htmlnano/issues/25
-[#24]: https://github.com/posthtml/htmlnano/issues/24
-[#22]: https://github.com/posthtml/htmlnano/issues/22
-[#21]: https://github.com/posthtml/htmlnano/issues/21
-[#20]: https://github.com/posthtml/htmlnano/issues/20
-[#19]: https://github.com/posthtml/htmlnano/issues/19
-[#17]: https://github.com/posthtml/htmlnano/issues/17
-[#13]: https://github.com/posthtml/htmlnano/issues/13
+[#373]: https://github.com/maltsev/htmlnano/issues/373
+[#342]: https://github.com/maltsev/htmlnano/issues/342
+[#336]: https://github.com/maltsev/htmlnano/issues/336
+[#328]: https://github.com/maltsev/htmlnano/issues/328
+[#293]: https://github.com/maltsev/htmlnano/issues/293
+[#278]: https://github.com/maltsev/htmlnano/issues/278
+[#260]: https://github.com/maltsev/htmlnano/issues/260
+[#257]: https://github.com/maltsev/htmlnano/issues/257
+[#220]: https://github.com/maltsev/htmlnano/issues/220
+[#197]: https://github.com/maltsev/htmlnano/issues/197
+[#195]: https://github.com/maltsev/htmlnano/issues/195
+[#185]: https://github.com/maltsev/htmlnano/issues/185
+[#184]: https://github.com/maltsev/htmlnano/issues/184
+[#182]: https://github.com/maltsev/htmlnano/issues/182
+[#180]: https://github.com/maltsev/htmlnano/issues/180
+[#170]: https://github.com/maltsev/htmlnano/issues/170
+[#168]: https://github.com/maltsev/htmlnano/issues/168
+[#165]: https://github.com/maltsev/htmlnano/issues/165
+[#163]: https://github.com/maltsev/htmlnano/issues/163
+[#161]: https://github.com/maltsev/htmlnano/issues/161
+[#159]: https://github.com/maltsev/htmlnano/issues/159
+[#158]: https://github.com/maltsev/htmlnano/issues/158
+[#157]: https://github.com/maltsev/htmlnano/issues/157
+[#156]: https://github.com/maltsev/htmlnano/issues/156
+[#154]: https://github.com/maltsev/htmlnano/issues/154
+[#153]: https://github.com/maltsev/htmlnano/issues/153
+[#145]: https://github.com/maltsev/htmlnano/issues/145
+[#135]: https://github.com/maltsev/htmlnano/issues/135
+[#129]: https://github.com/maltsev/htmlnano/issues/129
+[#127]: https://github.com/maltsev/htmlnano/issues/127
+[#125]: https://github.com/maltsev/htmlnano/issues/125
+[#122]: https://github.com/maltsev/htmlnano/issues/122
+[#120]: https://github.com/maltsev/htmlnano/issues/120
+[#119]: https://github.com/maltsev/htmlnano/issues/119
+[#117]: https://github.com/maltsev/htmlnano/issues/117
+[#116]: https://github.com/maltsev/htmlnano/issues/116
+[#114]: https://github.com/maltsev/htmlnano/issues/114
+[#113]: https://github.com/maltsev/htmlnano/issues/113
+[#112]: https://github.com/maltsev/htmlnano/issues/112
+[#111]: https://github.com/maltsev/htmlnano/issues/111
+[#110]: https://github.com/maltsev/htmlnano/issues/110
+[#108]: https://github.com/maltsev/htmlnano/issues/108
+[#107]: https://github.com/maltsev/htmlnano/issues/107
+[#104]: https://github.com/maltsev/htmlnano/issues/104
+[#102]: https://github.com/maltsev/htmlnano/issues/102
+[#98]: https://github.com/maltsev/htmlnano/issues/98
+[#95]: https://github.com/maltsev/htmlnano/issues/95
+[#94]: https://github.com/maltsev/htmlnano/issues/94
+[#90]: https://github.com/maltsev/htmlnano/issues/90
+[#88]: https://github.com/maltsev/htmlnano/issues/88
+[#84]: https://github.com/maltsev/htmlnano/issues/84
+[#80]: https://github.com/maltsev/htmlnano/issues/80
+[#79]: https://github.com/maltsev/htmlnano/issues/79
+[#78]: https://github.com/maltsev/htmlnano/issues/78
+[#76]: https://github.com/maltsev/htmlnano/issues/76
+[#71]: https://github.com/maltsev/htmlnano/issues/71
+[#67]: https://github.com/maltsev/htmlnano/issues/67
+[#66]: https://github.com/maltsev/htmlnano/issues/66
+[#65]: https://github.com/maltsev/htmlnano/issues/65
+[#64]: https://github.com/maltsev/htmlnano/issues/64
+[#62]: https://github.com/maltsev/htmlnano/issues/62
+[#59]: https://github.com/maltsev/htmlnano/issues/59
+[#55]: https://github.com/maltsev/htmlnano/issues/55
+[#50]: https://github.com/maltsev/htmlnano/issues/50
+[#48]: https://github.com/maltsev/htmlnano/issues/48
+[#47]: https://github.com/maltsev/htmlnano/issues/47
+[#42]: https://github.com/maltsev/htmlnano/issues/42
+[#39]: https://github.com/maltsev/htmlnano/issues/39
+[#36]: https://github.com/maltsev/htmlnano/issues/36
+[#31]: https://github.com/maltsev/htmlnano/issues/31
+[#30]: https://github.com/maltsev/htmlnano/issues/30
+[#28]: https://github.com/maltsev/htmlnano/issues/28
+[#25]: https://github.com/maltsev/htmlnano/issues/25
+[#24]: https://github.com/maltsev/htmlnano/issues/24
+[#22]: https://github.com/maltsev/htmlnano/issues/22
+[#21]: https://github.com/maltsev/htmlnano/issues/21
+[#20]: https://github.com/maltsev/htmlnano/issues/20
+[#19]: https://github.com/maltsev/htmlnano/issues/19
+[#17]: https://github.com/maltsev/htmlnano/issues/17
+[#13]: https://github.com/maltsev/htmlnano/issues/13

@@ -89,7 +89,7 @@ describe('removeComments', () => {
             );
         });
 
-        // https://github.com/posthtml/htmlnano/issues/137
+        // https://github.com/maltsev/htmlnano/issues/137
         it('issue #137', () => {
             return init(
                 '<div id="baz">Some text which... <!-- a comment --> ...surrounds a comment.</div>',

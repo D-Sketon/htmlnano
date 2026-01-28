@@ -29,7 +29,7 @@ module.exports = {
                     dropdownActiveClassDisabled: true
                 },
                 {
-                    href: 'https://github.com/posthtml/htmlnano',
+                    href: 'https://github.com/maltsev/htmlnano',
                     label: 'GitHub',
                     position: 'right'
                 }
@@ -50,7 +50,7 @@ module.exports = {
                 docs: {
                     sidebarPath: require.resolve('./sidebars.js'),
                     routeBasePath: '/',
-                    editUrl: 'https://github.com/posthtml/htmlnano/edit/master/docs/'
+                    editUrl: 'https://github.com/maltsev/htmlnano/edit/master/docs/'
                 }
             }
         ]

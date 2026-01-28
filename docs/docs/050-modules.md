@@ -598,7 +598,7 @@ If the element has any attributes, the tag is preserved.
 
 #### Notes
 - htmlnano can only remove a tag when both its start and end tags can be omitted.
-- Due to [the limitation of PostHTML](https://github.com/posthtml/htmlnano/issues/99), htmlnano can’t remove only the start tag or only the end tag of an element.
+- Due to [the limitation of PostHTML](https://github.com/maltsev/htmlnano/issues/99), htmlnano can’t remove only the start tag or only the end tag of an element.
 - Supported optional tags are limited to the ones that can be removed as a pair.
 
 Supported tags and key rules:

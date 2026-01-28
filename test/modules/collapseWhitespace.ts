@@ -143,7 +143,7 @@ describe('collapseWhitespace', () => {
             );
         });
 
-        // https://github.com/posthtml/htmlnano/issues/145
+        // https://github.com/maltsev/htmlnano/issues/145
         it('issue #145', () => {
             return init(
                 'before <a href="#link"> <i>after</i> </a> end',

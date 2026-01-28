@@ -143,7 +143,7 @@ describe('minifyJs', () => {
     });
 
     // This test fails.
-    // For more info see https://github.com/posthtml/htmlnano/issues/41
+    // For more info see https://github.com/maltsev/htmlnano/issues/41
     // it('should not break quotes inside on* attributes code', () => {
     //     return init(
     //         `<a href="#" onclick="myFunc('my string')"></a>

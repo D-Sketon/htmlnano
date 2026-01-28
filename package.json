@@ -134,10 +134,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/posthtml/htmlnano.git"
+    "url": "git://github.com/maltsev/htmlnano.git"
   },
   "bugs": {
-    "url": "https://github.com/posthtml/htmlnano/issues"
+    "url": "https://github.com/maltsev/htmlnano/issues"
   },
-  "homepage": "https://github.com/posthtml/htmlnano"
+  "homepage": "https://github.com/maltsev/htmlnano"
 }

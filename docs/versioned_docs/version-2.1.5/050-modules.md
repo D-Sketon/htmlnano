@@ -26,7 +26,7 @@ Minified:
 ```
 
 ### removeEmptyAttributes
-Removes empty [safe-to-remove](https://github.com/posthtml/htmlnano/blob/master/src/_modules/removeEmptyAttributes.ts) attributes.
+Removes empty [safe-to-remove](https://github.com/maltsev/htmlnano/blob/master/src/_modules/removeEmptyAttributes.ts) attributes.
 
 #### Side effects
 This module could break your styles or JS if you use selectors with attributes:
@@ -449,7 +449,7 @@ Minified:
 ```
 
 #### Notice
-Due to [the limitation of PostHTML](https://github.com/posthtml/htmlnano/issues/99), htmlnano can't remove only the start tag or the end tag of an element. Currently, htmlnano only supports removing the following optional tags, as htmlnano can remove their start tag and end tag at the same time:
+Due to [the limitation of PostHTML](https://github.com/maltsev/htmlnano/issues/99), htmlnano can't remove only the start tag or the end tag of an element. Currently, htmlnano only supports removing the following optional tags, as htmlnano can remove their start tag and end tag at the same time:
 
 - `html`
 - `head`
@@ -475,7 +475,7 @@ Minified:
 ```
 
 #### Notice
-Due to [the limitation of PostHTML](https://github.com/posthtml/htmlnano/issues/99), htmlnano can't remove only the start tag or the end tag of an element. Currently, htmlnano only supports removing the following optional tags, as htmlnano can remove their start tag and end tag at the same time:
+Due to [the limitation of PostHTML](https://github.com/maltsev/htmlnano/issues/99), htmlnano can't remove only the start tag or the end tag of an element. Currently, htmlnano only supports removing the following optional tags, as htmlnano can remove their start tag and end tag at the same time:
 
 - `html`
 - `head`

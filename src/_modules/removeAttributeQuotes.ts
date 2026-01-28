@@ -1,6 +1,6 @@
 // Specification: https://html.spec.whatwg.org/multipage/syntax.html#attributes-2
 // See also: https://github.com/posthtml/posthtml-render/pull/30
-// See also: https://github.com/posthtml/htmlnano/issues/6#issuecomment-707105334
+// See also: https://github.com/maltsev/htmlnano/issues/6#issuecomment-707105334
 
 import type { HtmlnanoModule } from '../types';
 
