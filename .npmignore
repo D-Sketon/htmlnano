@@ -8,3 +8,4 @@ npm-debug.log
 /docs/.docusaurus
 /docs/build
 /docs/node_modules
+/.worktrees/
