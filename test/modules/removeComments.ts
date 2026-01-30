@@ -156,6 +156,16 @@ describe('removeComments', () => {
             );
         });
 
+        it('RegExp string', () => {
+            return init(
+                '<!--noindex-->this text will not be indexed<!--/noindex-->Lorem ipsum dolor sit amet<!--more-->Lorem ipsum dolor sit amet',
+                'this text will not be indexedLorem ipsum dolor sit amet<!--more-->Lorem ipsum dolor sit amet',
+                {
+                    removeComments: '/<!--(\\/)?noindex-->/'
+                }
+            );
+        });
+
         it('Function', () => {
             return init(
                 '<!--noindex-->this text will not be indexed<!--/noindex-->Lorem ipsum dolor sit amet<!--more-->Lorem ipsum dolor sit amet',
@@ -176,7 +186,7 @@ describe('removeComments', () => {
                 '<!--noindex-->Keep<!--/noindex--><!-- removed -->',
                 '<!--noindex-->Keep<!--/noindex-->',
                 {
-                    removeComments: 'unknown' as unknown as RemoveCommentsOptions
+                    removeComments: '/[a-/' as unknown as RemoveCommentsOptions
                 }
             );
         });

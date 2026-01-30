@@ -478,6 +478,7 @@ Minified (with `conservative`):
   (default)
 - `all` — removes all HTML comments, including conditional/noindex/sse/excerpt comments
 - A `RegExp` — removes HTML comments that match the regexp (non-matching comments are kept)
+- A string — treated as a regexp pattern. Supports `/pattern/flags` or a plain pattern string (useful in JSON config files)
 - A `Function` that returns boolean — removes HTML comments for which the callback returns a truthy value
 
 #### Example
@@ -538,6 +539,14 @@ Minified:
 
 ```html
 <div>this text will not be indexedLorem ipsum dolor sit amet<!--more-->Lorem ipsum dolor sit amet</div>
+```
+
+Source (JSON config):
+
+```json
+{
+    "removeComments": "/<!--(\\/)?noindex-->/"
+}
 ```
 
 Source:

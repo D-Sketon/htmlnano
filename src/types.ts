@@ -42,7 +42,7 @@ export interface HtmlnanoOptions {
     removeAttributeQuotes?: boolean | {
         force?: boolean;
     };
-    removeComments?: boolean | 'safe' | 'all' | RegExp | ((comment: string) => boolean);
+    removeComments?: boolean | RegExp | ((comment: string) => boolean) | string;
     removeEmptyAttributes?: boolean;
     removeRedundantAttributes?: boolean;
     removeOptionalTags?: boolean;

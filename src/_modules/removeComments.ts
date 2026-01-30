@@ -5,14 +5,12 @@ const MATCH_EXCERPT_REGEXP = /^\s*more\b/i;
 const MATCH_NOINDEX_REGEXP = /^\s*\/?\s*noindex\s*$/i;
 const MATCH_SSE_REGEXP = /^\s*\/?\s*sse\s*$/i;
 
-export type RemoveCommentsOptions = boolean | 'safe' | 'all' | RegExp | ((comment: string) => boolean);
+export type RemoveCommentsOptions = boolean | RegExp | ((comment: string) => boolean) | string;
 
 /** Removes HTML comments */
 const mod: HtmlnanoModule<RemoveCommentsOptions> = {
     onNode(_, removeType) {
-        if (removeType !== 'all' && removeType !== 'safe' && !isMatcher(removeType)) {
-            removeType = 'safe';
-        }
+        removeType = normalizeRemoveType(removeType);
         return (node) => {
             if (isCommentToRemove(node, removeType)) {
                 return '';
@@ -21,9 +19,7 @@ const mod: HtmlnanoModule<RemoveCommentsOptions> = {
         };
     },
     onContent(_, removeType) {
-        if (removeType !== 'all' && removeType !== 'safe' && !isMatcher(removeType)) {
-            removeType = 'safe';
-        }
+        removeType = normalizeRemoveType(removeType);
         return (contents) => {
             return contents.filter(content => !isCommentToRemove(content, removeType));
         };
@@ -92,12 +88,44 @@ function isMatch(input: string, matcher: Partial<RemoveCommentsOptions>): boolea
     return false;
 }
 
+function normalizeRemoveType(removeType: Partial<RemoveCommentsOptions>): Partial<RemoveCommentsOptions> {
+    if (removeType === 'all' || removeType === 'safe' || isMatcher(removeType)) {
+        return removeType;
+    }
+
+    if (typeof removeType === 'string') {
+        const regexp = parseRegexString(removeType);
+        if (regexp) {
+            return regexp;
+        }
+    }
+
+    return 'safe';
+}
+
 function isMatcher(matcher: Partial<RemoveCommentsOptions>) {
     if (matcher instanceof RegExp || typeof matcher === 'function') {
         return true;
     }
 
     return false;
+}
+
+function parseRegexString(value: string): RegExp | null {
+    const literalMatch = value.match(/^\/([\s\S]+)\/([gimsuy]*)$/);
+    if (literalMatch) {
+        return tryCreateRegExp(literalMatch[1], literalMatch[2]);
+    }
+
+    return tryCreateRegExp(value);
+}
+
+function tryCreateRegExp(pattern: string, flags?: string): RegExp | null {
+    try {
+        return new RegExp(pattern, flags);
+    } catch {
+        return null;
+    }
 }
 
 function getCommentBody(text: string): string | null {

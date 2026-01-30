@@ -390,6 +390,7 @@ Collapses redundant white spaces (including new lines). It doesn’t affect whit
 - `safe` – removes all HTML comments except conditional comments, `<!--noindex--><!--/noindex-->`, `<!--sse--><!--/sse-->`, and excerpt comments like `<!-- more -->` or `<!-- more Read more -->` (case/spacing tolerant) (default)
 - `all` — removes all HTML comments
 - A `RegExp` — only HTML comments matching the given regexp will be removed.
+- A string — treated as a regexp pattern. Supports `/pattern/flags` or a plain pattern string (useful in JSON config files)
 - A `Function` that returns boolean — removes HTML comments that can make the given callback function returns truthy value.
 
 #### Example
@@ -428,6 +429,14 @@ Minified:
 
 ```html
 <div>this text will not be indexedLorem ipsum dolor sit amet<!--more-->Lorem ipsum dolor sit amet</div>
+```
+
+Source (JSON config):
+
+```json
+{
+    "removeComments": "/<!--(\\/)?noindex-->/"
+}
 ```
 
 Source:
