@@ -37,6 +37,7 @@ export interface HtmlnanoOptions {
     minifyConditionalComments?: boolean;
     minifyJs?: MinifyOptions | boolean;
     minifyJson?: boolean;
+    minifyAttributes?: boolean;
     minifySvg?: SvgoOptimizeOptions | boolean;
     normalizeAttributeValues?: boolean;
     removeAttributeQuotes?: boolean | {

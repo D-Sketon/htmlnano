@@ -22,6 +22,7 @@ export default {
     },
     deduplicateAttributeValues: true,
 
+    minifyAttributes: true,
     minifyUrls: false,
 
     sortAttributes: false,

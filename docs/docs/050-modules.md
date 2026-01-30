@@ -207,6 +207,24 @@ Minified:
 <a class="foo    bar">click</a>
 ```
 
+### minifyAttributes
+Minify specific attribute values. Currently this module targets
+`meta[http-equiv="refresh"]` by removing the `url=` prefix when present,
+trimming whitespace, and dropping empty URLs.
+
+#### Example
+Source:
+```html
+<meta http-equiv="refresh" content="5; url=">
+<meta http-equiv="refresh" content="5; url=http://example.com/">
+```
+
+Minified:
+```html
+<meta http-equiv="refresh" content="5">
+<meta http-equiv="refresh" content="5; http://example.com/">
+```
+
 ### minifyUrls
 Convert absolute URL to relative URL using [relateurl](https://www.npmjs.com/package/relateurl).
 

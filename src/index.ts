@@ -122,6 +122,7 @@ const modules = {
     minifyCss: () => interop(import('./_modules/minifyCss')),
     minifyJs: () => interop(import('./_modules/minifyJs')),
     minifyJson: () => interop(import('./_modules/minifyJson')),
+    minifyAttributes: () => interop(import('./_modules/minifyAttributes')),
     minifySvg: () => interop(import('./_modules/minifySvg')),
     minifyUrls: () => interop(import('./_modules/minifyUrls')),
     normalizeAttributeValues: () => interop(import('./_modules/normalizeAttributeValues')),
