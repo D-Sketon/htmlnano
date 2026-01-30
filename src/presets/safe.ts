@@ -33,6 +33,7 @@ export default {
      * ---------------------------------------- */
     collapseWhitespace: 'conservative',
     removeComments: 'safe',
+    removeEmptyElements: false,
     minifyConditionalComments: false,
     removeOptionalTags: false,
     removeAttributeQuotes: false,

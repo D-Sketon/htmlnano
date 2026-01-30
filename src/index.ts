@@ -129,6 +129,7 @@ const modules = {
     removeAttributeQuotes: () => interop(import('./_modules/removeAttributeQuotes')),
     removeComments: () => interop(import('./_modules/removeComments')),
     removeEmptyAttributes: () => interop(import('./_modules/removeEmptyAttributes')),
+    removeEmptyElements: () => interop(import('./_modules/removeEmptyElements')),
     removeOptionalTags: () => interop(import('./_modules/removeOptionalTags')),
     removeRedundantAttributes: () => interop(import('./_modules/removeRedundantAttributes')),
     removeUnusedCss: () => interop(import('./_modules/removeUnusedCss')),

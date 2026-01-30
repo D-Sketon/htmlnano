@@ -588,6 +588,39 @@ Minified:
 <div>this text will not be indexedLorem ipsum dolor sit amet<!--more-->Lorem ipsum dolor sit amet</div>
 ```
 
+### removeEmptyElements
+Removes elements that have no meaningful content.
+
+#### Options
+- `true` — removes empty elements without attributes.
+- `{ removeWithAttributes: true }` — removes empty elements even if they have attributes.
+
+Empty elements are defined as elements with no child elements and only whitespace/comments as content.
+Void elements (like `<img>` or `<br>`) are never removed.
+
+#### Side effects
+This module can remove elements that are used for styling or scripting (for example `<span class="icon"></span>`).
+It is disabled by default.
+
+#### Example
+Source:
+```html
+<div>hello<span><b></b></span></div>
+<div><span class="icon"></span></div>
+```
+
+Minified (`removeEmptyElements: true`):
+```html
+<div>hello</div>
+<div><span class="icon"></span></div>
+```
+
+Minified (`removeEmptyElements: { removeWithAttributes: true }`):
+```html
+<div>hello</div>
+<div></div>
+```
+
 ### minifyConditionalComments
 Minifies HTML inside IE conditional comments (both downlevel-hidden and downlevel-revealed forms).
 The conditional comment wrappers are preserved while the inner HTML is processed with the same htmlnano options,

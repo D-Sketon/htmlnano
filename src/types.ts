@@ -45,6 +45,9 @@ export interface HtmlnanoOptions {
     };
     removeComments?: boolean | RegExp | ((comment: string) => boolean) | string;
     removeEmptyAttributes?: boolean;
+    removeEmptyElements?: boolean | {
+        removeWithAttributes?: boolean;
+    };
     removeRedundantAttributes?: boolean;
     removeOptionalTags?: boolean;
     removeUnusedCss?: boolean
