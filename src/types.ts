@@ -18,6 +18,12 @@ type MaybeArray<T> = T | Array<T>;
 
 export type PostHTMLNodeLike = PostHTML.Node | string;
 
+export type HtmlnanoTemplateRule = {
+    tag: string;
+    attrs?: Record<string, string | boolean | void>;
+};
+export type MinifyHtmlTemplateOptions = boolean | HtmlnanoTemplateRule[];
+
 export interface HtmlnanoOptions {
     skipConfigLoading?: boolean;
     configPath?: string;
@@ -34,6 +40,7 @@ export interface HtmlnanoOptions {
     mergeStyles?: boolean;
     mergeScripts?: boolean;
     minifyCss?: CssNanoOptions | boolean;
+    minifyHtmlTemplate?: MinifyHtmlTemplateOptions;
     minifyConditionalComments?: boolean;
     minifyJs?: MinifyOptions | boolean;
     minifyJson?: boolean;

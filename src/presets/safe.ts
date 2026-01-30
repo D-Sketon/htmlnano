@@ -45,6 +45,7 @@ export default {
     minifyCss: {
         preset: 'default'
     },
+    minifyHtmlTemplate: true,
     minifyJs: {},
     minifyJson: {},
     minifySvg: {

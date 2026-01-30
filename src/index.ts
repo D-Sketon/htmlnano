@@ -120,6 +120,7 @@ const modules = {
     mergeStyles: () => interop(import('./_modules/mergeStyles')),
     minifyConditionalComments: () => interop(import('./_modules/minifyConditionalComments')),
     minifyCss: () => interop(import('./_modules/minifyCss')),
+    minifyHtmlTemplate: () => interop(import('./_modules/minifyHtmlTemplate')),
     minifyJs: () => interop(import('./_modules/minifyJs')),
     minifyJson: () => interop(import('./_modules/minifyJson')),
     minifyAttributes: () => interop(import('./_modules/minifyAttributes')),
