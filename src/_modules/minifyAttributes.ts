@@ -1,6 +1,25 @@
+import { isEventHandler } from '../helpers';
 import type { HtmlnanoModule } from '../types';
+import { isListAttribute, isSingleValueAttribute } from './collapseAttributeWhitespace';
 
 const asciiWhitespace = new Set(['\t', '\n', '\f', '\r', ' ']);
+
+type RedundantWhitespaceMode = 'safe' | 'agressive' | false;
+
+type MinifyAttributesOptions = {
+    metaContent?: boolean;
+    redundantWhitespaces?: RedundantWhitespaceMode | 'aggressive';
+};
+
+type NormalizedOptions = {
+    metaContent: boolean;
+    redundantWhitespaces: RedundantWhitespaceMode;
+};
+
+const defaultOptions: NormalizedOptions = {
+    metaContent: true,
+    redundantWhitespaces: 'safe'
+};
 
 function isAsciiWhitespace(char: string) {
     return asciiWhitespace.has(char);
@@ -96,17 +115,99 @@ function isMetaRefresh(attrs: Record<string, string | boolean | void>, tagName?:
     return httpEquiv.trim().toLowerCase() === 'refresh';
 }
 
-const mod: HtmlnanoModule = {
-    onAttrs() {
+function normalizeOptions(moduleOptions: Partial<MinifyAttributesOptions> | boolean): NormalizedOptions {
+    if (moduleOptions && typeof moduleOptions === 'object') {
+        let redundantWhitespaces: RedundantWhitespaceMode = defaultOptions.redundantWhitespaces;
+
+        if (moduleOptions.redundantWhitespaces === 'aggressive') {
+            redundantWhitespaces = 'agressive';
+        } else if (
+            moduleOptions.redundantWhitespaces === 'safe'
+            || moduleOptions.redundantWhitespaces === 'agressive'
+            || moduleOptions.redundantWhitespaces === false
+        ) {
+            redundantWhitespaces = moduleOptions.redundantWhitespaces;
+        }
+
+        return {
+            metaContent: moduleOptions.metaContent !== false,
+            redundantWhitespaces
+        };
+    }
+
+    return defaultOptions;
+}
+
+function collapseWhitespace(value: string) {
+    return value.replace(/\s+/g, ' ').trim();
+}
+
+function minifyAttributeWhitespace(
+    mode: RedundantWhitespaceMode,
+    attrName: string,
+    attrValue: string,
+    tagName?: string
+): string | null {
+    if (!mode) {
+        return null;
+    }
+
+    const attrNameLower = attrName.toLowerCase();
+
+    if (isListAttribute(attrNameLower, tagName)) {
+        const collapsed = collapseWhitespace(attrValue);
+        return collapsed === attrValue ? null : collapsed;
+    }
+
+    if (isEventHandler(attrName)) {
+        const trimmed = attrValue.trim();
+        return trimmed === attrValue ? null : trimmed;
+    }
+
+    if (isSingleValueAttribute(attrNameLower, tagName)) {
+        const trimmed = attrValue.trim();
+        return trimmed === attrValue ? null : trimmed;
+    }
+
+    if (mode === 'agressive') {
+        const trimmed = attrValue.trim();
+        return trimmed === attrValue ? null : trimmed;
+    }
+
+    return null;
+}
+
+const mod: HtmlnanoModule<MinifyAttributesOptions> = {
+    onAttrs(_options, moduleOptions) {
+        const normalizedOptions = normalizeOptions(moduleOptions);
+
         return (attrs, node) => {
-            if (!isMetaRefresh(attrs, node.tag)) return attrs;
+            if (normalizedOptions.metaContent && isMetaRefresh(attrs, node.tag)) {
+                const content = attrs.content;
+                if (typeof content === 'string') {
+                    const minified = minifyMetaRefreshValue(content);
+                    if (minified !== null && minified !== content) {
+                        attrs.content = minified;
+                    }
+                }
+            }
 
-            const content = attrs.content;
-            if (typeof content !== 'string') return attrs;
+            if (normalizedOptions.redundantWhitespaces) {
+                const tagName = node.tag ? node.tag.toLowerCase() : undefined;
 
-            const minified = minifyMetaRefreshValue(content);
-            if (minified !== null && minified !== content) {
-                attrs.content = minified;
+                Object.entries(attrs).forEach(([attrName, attrValue]) => {
+                    if (typeof attrValue !== 'string') return;
+
+                    const minified = minifyAttributeWhitespace(
+                        normalizedOptions.redundantWhitespaces,
+                        attrName,
+                        attrValue,
+                        tagName
+                    );
+                    if (minified !== null) {
+                        attrs[attrName] = minified;
+                    }
+                });
             }
 
             return attrs;

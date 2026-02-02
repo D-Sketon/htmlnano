@@ -9,6 +9,10 @@ export default { ...safePreset,
     removeComments: 'all',
     removeAttributeQuotes: true,
     removeRedundantAttributes: true,
+    minifyAttributes: {
+        metaContent: true,
+        redundantWhitespaces: 'agressive'
+    },
     mergeScripts: true,
     mergeStyles: true,
     removeUnusedCss: {},

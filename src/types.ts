@@ -44,7 +44,10 @@ export interface HtmlnanoOptions {
     minifyConditionalComments?: boolean;
     minifyJs?: MinifyOptions | boolean;
     minifyJson?: boolean;
-    minifyAttributes?: boolean;
+    minifyAttributes?: boolean | {
+        metaContent?: boolean;
+        redundantWhitespaces?: 'safe' | 'agressive' | false;
+    };
     minifySvg?: SvgoOptimizeOptions | boolean;
     normalizeAttributeValues?: boolean;
     removeAttributeQuotes?: boolean | {

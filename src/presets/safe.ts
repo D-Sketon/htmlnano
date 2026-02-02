@@ -22,7 +22,10 @@ export default {
     },
     deduplicateAttributeValues: true,
 
-    minifyAttributes: true,
+    minifyAttributes: {
+        metaContent: true,
+        redundantWhitespaces: 'safe'
+    },
     minifyUrls: false,
 
     sortAttributes: false,

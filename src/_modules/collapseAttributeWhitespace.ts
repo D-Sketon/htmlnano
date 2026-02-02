@@ -33,7 +33,7 @@ export function isListAttribute(attrName: string, tagName?: string) {
 }
 
 /** empty set means the attribute is alwasy trimmable */
-const attributesWithSingleValue = new Map<string, Set<string>>([
+export const attributesWithSingleValue = new Map<string, Set<string>>([
     ['accept', new Set(['input'])],
     ['action', new Set(['form'])],
     ['accesskey', new Set()],
@@ -83,6 +83,22 @@ const attributesWithSingleValue = new Map<string, Set<string>>([
     ['width', new Set(['canvas', 'embed', 'iframe', 'img', 'input', 'object', 'video'])]
 ]);
 
+export function isSingleValueAttribute(attrName: string, tagName?: string) {
+    const attrKey = attrName.toLowerCase();
+    const tagSet = attributesWithSingleValue.get(attrKey);
+    if (!tagSet) {
+        return false;
+    }
+    if (!tagName) {
+        return false;
+    }
+    if (tagSet.size === 0) {
+        return true;
+    }
+
+    return tagSet.has(tagName.toLowerCase());
+}
+
 /** Collapse whitespaces inside list-like attributes (e.g. class, rel) */
 const mod: HtmlnanoModule = {
     onAttrs() {
@@ -103,11 +119,8 @@ const mod: HtmlnanoModule = {
 
                 if (isEventHandler(attrName)) {
                     newAttrs[attrName] = attrValue.trim();
-                } else if (tagName && attributesWithSingleValue.has(attrNameLower)) {
-                    const tagSet = attributesWithSingleValue.get(attrNameLower)!;
-                    if (tagSet.size === 0 || tagSet.has(tagName)) {
-                        newAttrs[attrName] = attrValue.trim();
-                    }
+                } else if (isSingleValueAttribute(attrNameLower, tagName)) {
+                    newAttrs[attrName] = attrValue.trim();
                 }
             });
 

@@ -78,4 +78,43 @@ describe('minifyAttributes', () => {
             );
         });
     });
+
+    context('redundantWhitespaces', () => {
+        it('should collapse list-like and trim single-value attributes in safe mode', () => {
+            return init(
+                '<a class=" foo  bar " href="  https://example.com  " id=" foo  bar ">click</a>',
+                '<a class="foo bar" href="https://example.com" id=" foo  bar ">click</a>',
+                {
+                    minifyAttributes: {
+                        redundantWhitespaces: 'safe'
+                    }
+                }
+            );
+        });
+
+        it('should trim other attributes in agressive mode', () => {
+            return init(
+                '<div id="  foo  bar  " data-value="  keep  "></div>',
+                '<div id="foo  bar" data-value="keep"></div>',
+                {
+                    minifyAttributes: {
+                        redundantWhitespaces: 'agressive'
+                    }
+                }
+            );
+        });
+    });
+
+    it('should allow disabling meta content minification', () => {
+        return init(
+            '<meta http-equiv="refresh" content="5; url=http://example.com/">',
+            '<meta http-equiv="refresh" content="5; url=http://example.com/">',
+            {
+                minifyAttributes: {
+                    metaContent: false,
+                    redundantWhitespaces: false
+                }
+            }
+        );
+    });
 });

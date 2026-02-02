@@ -212,6 +212,13 @@ Minify specific attribute values. Currently this module targets
 `meta[http-equiv="refresh"]` by removing the `url=` prefix when present,
 trimming whitespace, and dropping empty URLs.
 
+#### Options
+- `metaContent` (`boolean`) - enable minification for `meta[http-equiv="refresh"]`.
+- `redundantWhitespaces` - remove redundant whitespace from attribute values.
+  - `safe` - collapse whitespace in list-like attributes and trim single-value attributes (similar to `collapseAttributeWhitespace`).
+  - `agressive` - also trims other attribute values.
+  - `false` - disable this behavior.
+
 #### Example
 Source:
 ```html
