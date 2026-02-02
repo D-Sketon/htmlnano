@@ -6,25 +6,27 @@ import ampSafePreset from '../../dist/presets/ampSafe.mjs';
 describe('minifyUrls', () => {
     it('shouldn\'t be enabled with safe preset', () => {
         const html = '<a href="https://example.com/foo/bar/baz">bar</a>';
-        return init(html, html, safePreset);
+        return init(html, html, {
+            minifyUrls: safePreset.minifyUrls
+        });
     });
 
     it('shouldn\'t be enabled with max preset', () => {
         const html = '<a href="https://example.com/foo/bar/baz">bar</a>';
-        return init(html, '<a href=https://example.com/foo/bar/baz>bar</a>', maxPreset);
+        return init(html, html, { minifyUrls: maxPreset.minifyUrls });
     });
 
     it('shouldn\'t be enabled with ampSafe preset', () => {
         const html = '<a href="https://example.com/foo/bar/baz">bar</a>';
-        return init(html, html, ampSafePreset);
+        return init(html, html, { minifyUrls: ampSafePreset.minifyUrls });
     });
 
     it('shouldn\'t be enabled with invalid configuration', () => {
         const html = '<a href="https://example.com/foo/bar/baz">bar</a>';
         return Promise.all([
-            init(html, html, { ...safePreset, minifyUrls: 1000 }),
+            init(html, html, { minifyUrls: 1000 }),
             // "true" is not allowed since relateurl requires a URL instance for base
-            init(html, html, { ...safePreset, minifyUrls: true })
+            init(html, html, { minifyUrls: true })
         ]);
     });
 
@@ -35,7 +37,7 @@ describe('minifyUrls', () => {
         return init(
             html,
             expected,
-            { ...safePreset, minifyUrls: new URL('https://example.com') }
+            { minifyUrls: new URL('https://example.com') }
         );
     });
 
@@ -46,7 +48,7 @@ describe('minifyUrls', () => {
         return init(
             html,
             expected,
-            { ...safePreset, minifyUrls: 'https://example.com' }
+            { minifyUrls: 'https://example.com' }
         );
     });
 
@@ -55,22 +57,22 @@ describe('minifyUrls', () => {
             init(
                 '<a href="https://example.com/foo/bar/baz">bar</a>',
                 '<a href="bar/baz">bar</a>',
-                { ...safePreset, minifyUrls: 'https://example.com/foo/' }
+                { minifyUrls: 'https://example.com/foo/' }
             ),
             init(
                 '<a href="https://example.com/foo/bar">bar</a>',
                 '<a href="../bar">bar</a>',
-                { ...safePreset, minifyUrls: 'https://example.com/foo/baz/' }
+                { minifyUrls: 'https://example.com/foo/baz/' }
             ),
             init(
                 '<a href="https://example.com/foo/bar/baz">bar</a>',
                 '<a href="/foo/bar/baz">bar</a>',
-                { ...safePreset, minifyUrls: 'https://example.com/baz/' }
+                { minifyUrls: 'https://example.com/baz/' }
             ),
             init(
                 '<a href="https://example.com/foo/bar/index.html">bar</a>',
                 '<a href="/foo/bar/">bar</a>',
-                { ...safePreset, minifyUrls: 'https://example.com/bar/baz/' }
+                { minifyUrls: 'https://example.com/bar/baz/' }
             )
         ]);
     });
@@ -78,14 +80,14 @@ describe('minifyUrls', () => {
     it('shouldn\'t process link[rel=canonical] tag', () => {
         const html = '<link href="https://example.com/baz/" rel="canonical">';
 
-        return init(html, html, { ...safePreset, minifyUrls: 'https://example.com/' });
+        return init(html, html, { minifyUrls: 'https://example.com/' });
     });
 
     it('should process srcset', () => {
         return init(
             '<img srcset="https://example.com/foo/bar/image.png 1x, https://example.com/foo/bar/image2.png.png 2x">',
             '<img srcset="../bar/image.png 1x, ../bar/image2.png.png 2x">',
-            { ...safePreset, minifyUrls: 'https://example.com/foo/baz/' }
+            { minifyUrls: 'https://example.com/foo/baz/' }
         );
     });
 
@@ -95,7 +97,7 @@ describe('minifyUrls', () => {
         return init(
             html,
             html,
-            { ...safePreset, minifyUrls: 'https://example.com/foo/baz/' }
+            { minifyUrls: 'https://example.com/foo/baz/' }
         );
     });
 
@@ -103,7 +105,7 @@ describe('minifyUrls', () => {
         return init(
             '<img src="javascript:alert(true)">',
             '<img src="javascript:alert(!0)">',
-            { ...safePreset, minifyUrls: 'https://example.com/foo/baz/' }
+            { minifyUrls: 'https://example.com/foo/baz/' }
         );
     });
 
@@ -111,7 +113,7 @@ describe('minifyUrls', () => {
         return init(
             '<img src="JaVaScRiPt:alert(true)">',
             '<img src="javascript:alert(!0)">',
-            { ...safePreset, minifyUrls: 'https://example.com/foo/baz/' }
+            { minifyUrls: 'https://example.com/foo/baz/' }
         );
     });
 
@@ -119,25 +121,25 @@ describe('minifyUrls', () => {
         return init(
             '<img src="  JaVaScRiPt:alert(true)">',
             '<img src="  javascript:alert(!0)">',
-            { ...safePreset, collapseAttributeWhitespace: false, minifyUrls: 'https://example.com/foo/baz/' }
+            { minifyUrls: 'https://example.com/foo/baz/' }
         );
     });
 
     it('should skip non-http schemes', () => {
         const html = '<a href="mailto:user@example.com">mail</a><a href="tel:+123">tel</a><a href="data:text/plain,hi">data</a>';
-        return init(html, html, { ...safePreset, minifyUrls: 'https://example.com/' });
+        return init(html, html, { minifyUrls: 'https://example.com/' });
     });
 
     it('should skip hash and query only urls', () => {
         const html = '<a href="#section">hash</a><a href="?foo=bar">query</a>';
-        return init(html, html, { ...safePreset, minifyUrls: 'https://example.com/' });
+        return init(html, html, { minifyUrls: 'https://example.com/' });
     });
 
     it('should process link imagesrcset', () => {
         return init(
             '<link rel="preload" imagesrcset="https://example.com/foo/bar.png 1x, https://example.com/foo/baz.png 2x">',
             '<link rel="preload" imagesrcset="bar.png 1x, baz.png 2x">',
-            { ...safePreset, minifyUrls: 'https://example.com/foo/' }
+            { minifyUrls: 'https://example.com/foo/' }
         );
     });
 });
