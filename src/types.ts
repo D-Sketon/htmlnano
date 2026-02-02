@@ -7,6 +7,8 @@ import type { UserDefinedOptions as PurgeCSSOptions } from 'purgecss';
 export type PostHTMLTreeLike = [PostHTML.Node] & PostHTML.NodeAPI & {
     options?: {
         quoteAllAttributes?: boolean | undefined;
+        quoteStyle?: 0 | 1 | 2 | undefined;
+        replaceQuote?: boolean | undefined;
     } | undefined;
 
     render(): string;

@@ -1,6 +1,6 @@
 import type PostHTML from 'posthtml';
 import { extractTextContentFromNode, isEventHandler, optionalImport } from '../helpers';
-import type { HtmlnanoModule } from '../types';
+import type { HtmlnanoModule, PostHTMLTreeLike } from '../types';
 import { redundantScriptTypes } from './removeRedundantAttributes.js';
 
 import type { MinifyOptions } from 'terser';
@@ -54,7 +54,10 @@ const mod: HtmlnanoModule<MinifyOptions> = {
             return node;
         });
 
-        return Promise.all(promises).then(() => tree);
+        return Promise.all(promises).then(() => {
+            applySmartQuoteOptions(tree);
+            return tree;
+        });
     }
 };
 
@@ -98,6 +101,84 @@ function resolveScriptTerserOptions(terserOptions: MinifyOptions, mimeType: stri
     };
 }
 
+function resolveOnAttrTerserOptions(terserOptions: MinifyOptions) {
+    const output = terserOptions.output;
+    const format = terserOptions.format;
+
+    const outputHasQuoteStyle = !!(output && typeof output === 'object' && 'quote_style' in output);
+    const formatHasQuoteStyle = !!(format && typeof format === 'object' && 'quote_style' in format);
+
+    if (outputHasQuoteStyle || formatHasQuoteStyle) {
+        return terserOptions;
+    }
+
+    const resolved: MinifyOptions = { ...terserOptions };
+
+    if (format && typeof format === 'object') {
+        resolved.format = { ...format, ['quote_style']: 3 };
+    }
+
+    if (output && typeof output === 'object') {
+        resolved.output = { ...output, ['quote_style']: 3 };
+    }
+
+    if (!format && !output) {
+        resolved.output = { ['quote_style']: 3 };
+    }
+
+    return resolved;
+}
+
+function applySmartQuoteOptions(tree: PostHTMLTreeLike) {
+    const quoteState = analyzeTreeQuotes(tree);
+    if (!quoteState.needsSmartQuotes || quoteState.hasMixedQuotes) {
+        return;
+    }
+
+    tree.options ??= {};
+    tree.options.quoteStyle ??= 0;
+    tree.options.replaceQuote ??= false;
+}
+
+function analyzeTreeQuotes(tree: PostHTMLTreeLike) {
+    let needsSmartQuotes = false;
+    let hasMixedQuotes = false;
+
+    tree.walk((node) => {
+        if (!node || !node.attrs) {
+            return node;
+        }
+
+        for (const [attrName, attrValue] of Object.entries(node.attrs)) {
+            if (typeof attrValue !== 'string') {
+                continue;
+            }
+
+            const hasDoubleQuote = attrValue.includes('"');
+            const hasSingleQuote = attrValue.includes('\'');
+
+            if (hasDoubleQuote && isEventHandler(attrName)) {
+                needsSmartQuotes = true;
+            }
+
+            if (hasDoubleQuote && hasSingleQuote) {
+                hasMixedQuotes = true;
+            }
+
+            if (needsSmartQuotes && hasMixedQuotes) {
+                return node;
+            }
+        }
+
+        return node;
+    });
+
+    return {
+        needsSmartQuotes,
+        hasMixedQuotes
+    };
+}
+
 function processScriptNode(scriptNode: PostHTML.Node, terserOptions: MinifyOptions, terser: typeof import('terser')) {
     let js = extractTextContentFromNode(scriptNode).trim();
     if (!js.length) {
@@ -136,6 +217,8 @@ function processNodeWithOnAttrs(node: PostHTML.Node, terserOptions: MinifyOption
     const jsWrapperStart = 'a=function(){';
     const jsWrapperEnd = '};a();';
 
+    const onAttrTerserOptions = resolveOnAttrTerserOptions(terserOptions);
+
     const promises: Promise<void>[] = [];
     if (!node.attrs) {
         return promises;
@@ -157,7 +240,7 @@ function processNodeWithOnAttrs(node: PostHTML.Node, terserOptions: MinifyOption
         // "function _(){return false;}"
         const wrappedJs = jsWrapperStart + node.attrs[attrName] + jsWrapperEnd;
         const promise = terser
-            .minify(wrappedJs, terserOptions)
+            .minify(wrappedJs, onAttrTerserOptions)
             .then(({ code }) => {
                 if (code) {
                     const minifiedJs = code.substring(
