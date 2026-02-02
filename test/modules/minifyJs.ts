@@ -132,14 +132,13 @@ describe('minifyJs', () => {
         return init(
             '<script>foo["bar"] = 5;</script>',
             '<script>foo["bar"]=5;</script>',
-            Object.assign({}, options, {
+            {
                 minifyJs: {
                     compress: {
                         properties: false
                     }
                 }
-            })
-        );
+            });
     });
 
     // This test fails.
