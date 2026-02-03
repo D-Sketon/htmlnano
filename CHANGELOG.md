@@ -4,8 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [3.1.0] - 2026-02-03
 
-This release touches almost whole htmlnano code.
-Minifier modules are fully covered by tests and many new edge cases were added, so I don’t expect regressions, but please be aware.
+This release touches almost the whole htmlnano code.
+Minifier modules are fully covered by tests, and many new edge cases were added, so I don’t expect regressions, but please be aware.
 
 ### Added
 
