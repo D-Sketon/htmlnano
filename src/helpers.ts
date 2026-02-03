@@ -7,6 +7,9 @@ const ampBoilerplateAttributes = [
     'amp4email-boilerplate'
 ];
 
+const cssCdataStart = '<![CDATA[';
+const cssCdataEnd = ']]>';
+
 export function isAmpBoilerplate(node: PostHTML.Node) {
     if (!node.attrs) {
         return false;
@@ -37,6 +40,50 @@ export function isStyleNode(node: PostHTML.Node) {
 
 export function extractCssFromStyleNode(node: PostHTML.Node) {
     return Array.isArray(node.content) ? (node.content as string[]).join(' ') : node.content;
+}
+
+export function stripCssCdata(css: string): { strippedCss: string; isCdataWrapped: boolean } {
+    const trimmed = css.trim();
+    if (!trimmed.startsWith(cssCdataStart) || !trimmed.endsWith(cssCdataEnd)) {
+        return { strippedCss: css, isCdataWrapped: false };
+    }
+
+    const strippedCss = trimmed.slice(cssCdataStart.length, trimmed.length - cssCdataEnd.length);
+    return { strippedCss, isCdataWrapped: true };
+}
+
+export function wrapCssCdata(css: string, isCdataWrapped: boolean): string {
+    if (!isCdataWrapped) {
+        return css;
+    }
+    return `${cssCdataStart}${css}${cssCdataEnd}`;
+}
+
+export function isCssStyleType(node: PostHTML.Node): boolean {
+    if (!node.attrs || !('type' in node.attrs)) {
+        return true;
+    }
+
+    const rawType = node.attrs.type;
+    if (rawType === '') {
+        return true;
+    }
+
+    if (typeof rawType !== 'string') {
+        return false;
+    }
+
+    const normalizedType = rawType.trim().toLowerCase();
+    return /^text\/css(?:$|\s*;)/.test(normalizedType);
+}
+
+export function normalizeMimeType(value: string): string {
+    const trimmed = value.trim();
+    if (!trimmed) {
+        return '';
+    }
+    const [mimeType] = trimmed.split(';');
+    return mimeType.trim().toLowerCase();
 }
 
 export function isEventHandler(attributeName: string) {

@@ -1,6 +1,17 @@
 import { expect } from 'expect';
 import type { Expect } from 'expect';
-import { isAmpBoilerplate, isComment, isConditionalComment, isStyleNode, extractCssFromStyleNode, optionalImport } from '../dist/helpers.mjs';
+import {
+    extractCssFromStyleNode,
+    isAmpBoilerplate,
+    isComment,
+    isConditionalComment,
+    isCssStyleType,
+    isStyleNode,
+    normalizeMimeType,
+    optionalImport,
+    stripCssCdata,
+    wrapCssCdata
+} from '../dist/helpers.mjs';
 
 describe('[helpers]', () => {
     context('isAmpBoilerplate()', () => {
@@ -75,6 +86,65 @@ describe('[helpers]', () => {
 
         it('should return null when module not found', async () => {
             expect(await optionalImport('null')).toBe(null);
+        });
+    });
+
+    context('stripCssCdata()', () => {
+        it('should unwrap CDATA when present', () => {
+            expect(stripCssCdata('<![CDATA[.a { color: red; }]]>')).toEqual({
+                strippedCss: '.a { color: red; }',
+                isCdataWrapped: true
+            });
+        });
+
+        it('should keep input when no CDATA is present', () => {
+            expect(stripCssCdata('.a { color: red; }')).toEqual({
+                strippedCss: '.a { color: red; }',
+                isCdataWrapped: false
+            });
+        });
+    });
+
+    context('wrapCssCdata()', () => {
+        it('should wrap CSS when requested', () => {
+            expect(wrapCssCdata('body{}', true)).toBe('<![CDATA[body{}]]>');
+        });
+
+        it('should keep CSS when no wrapping is requested', () => {
+            expect(wrapCssCdata('body{}', false)).toBe('body{}');
+        });
+    });
+
+    context('isCssStyleType()', () => {
+        it('should treat missing type as CSS', () => {
+            expect(isCssStyleType({ tag: 'style' })).toBe(true);
+            expect(isCssStyleType({ tag: 'style', attrs: {} })).toBe(true);
+        });
+
+        it('should treat empty type as CSS', () => {
+            expect(isCssStyleType({ tag: 'style', attrs: { type: '' } })).toBe(true);
+        });
+
+        it('should reject non-string types', () => {
+            expect(isCssStyleType({ tag: 'style', attrs: { type: true } })).toBe(false);
+        });
+
+        it('should detect text/css types with parameters', () => {
+            expect(isCssStyleType({ tag: 'style', attrs: { type: 'text/css; charset=utf-8' } })).toBe(true);
+        });
+
+        it('should reject non-CSS types', () => {
+            expect(isCssStyleType({ tag: 'style', attrs: { type: 'text/plain' } })).toBe(false);
+        });
+    });
+
+    context('normalizeMimeType()', () => {
+        it('should normalize and lowercase mime types', () => {
+            expect(normalizeMimeType(' Text/HTML; charset=utf-8 ')).toBe('text/html');
+        });
+
+        it('should return empty string for blank values', () => {
+            expect(normalizeMimeType('   ')).toBe('');
         });
     });
 });

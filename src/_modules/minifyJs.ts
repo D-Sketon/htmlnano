@@ -1,5 +1,5 @@
 import type PostHTML from 'posthtml';
-import { extractTextContentFromNode, isEventHandler, optionalImport } from '../helpers';
+import { extractTextContentFromNode, isEventHandler, normalizeMimeType, optionalImport } from '../helpers';
 import type { HtmlnanoModule, PostHTMLTreeLike } from '../types';
 import { redundantScriptTypes } from './removeRedundantAttributes.js';
 
@@ -36,7 +36,7 @@ const mod: HtmlnanoModule<MinifyOptions> = {
             }
 
             if (node.tag && node.tag === 'script') {
-                const rawMimeType = normalizeScriptType(nodeAttrs.type);
+                const rawMimeType = typeof nodeAttrs.type === 'string' ? normalizeMimeType(nodeAttrs.type) : undefined;
                 const mimeType = rawMimeType || 'text/javascript';
                 if (redundantScriptTypes.has(mimeType) || mimeType === 'module') {
                     const scriptTerserOptions = resolveScriptTerserOptions(terserOptions, mimeType);
@@ -71,20 +71,6 @@ function stripCdata(js: string) {
 
     const strippedJs = leftStrippedJs.replace(/\/\/\s*\]\]>/, '').replace(/\/\*\s*\]\]>\s*\*\//, '');
     return leftStrippedJs === strippedJs ? js : strippedJs;
-}
-
-function normalizeScriptType(rawType: unknown) {
-    if (typeof rawType !== 'string') {
-        return undefined;
-    }
-
-    const trimmed = rawType.trim();
-    if (!trimmed) {
-        return '';
-    }
-
-    const [mimeType] = trimmed.split(';');
-    return mimeType.trim().toLowerCase();
 }
 
 function resolveScriptTerserOptions(terserOptions: MinifyOptions, mimeType: string) {

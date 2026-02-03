@@ -1,4 +1,5 @@
 import type PostHTML from 'posthtml';
+import { normalizeMimeType } from '../helpers';
 import type { HtmlnanoModule, HtmlnanoOptions, HtmlnanoTemplateRule, MinifyHtmlTemplateOptions, PostHTMLTreeLike } from '../types';
 
 type NormalizedRule = {
@@ -192,12 +193,7 @@ function normalizeAttrValue(attrName: string, value: string | boolean | void): s
     }
 
     if (attrName === 'type') {
-        const trimmed = value.trim();
-        if (!trimmed) {
-            return '';
-        }
-        const [mimeType] = trimmed.split(';');
-        return mimeType.trim().toLowerCase();
+        return normalizeMimeType(value);
     }
 
     return value;

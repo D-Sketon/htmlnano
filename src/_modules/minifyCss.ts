@@ -1,4 +1,4 @@
-import { isStyleNode, extractCssFromStyleNode, optionalImport } from '../helpers';
+import { extractCssFromStyleNode, isCssStyleType, isStyleNode, optionalImport, stripCssCdata, wrapCssCdata } from '../helpers';
 import type {} from 'postcss';
 import type { HtmlnanoModule } from '../types';
 import type PostHTML from 'posthtml';
@@ -10,9 +10,6 @@ const postcssOptions = {
     // > Set it to CSS file path or to `undefined` to prevent this warning.
     from: undefined
 };
-
-const cdataStart = '<![CDATA[';
-const cdataEnd = ']]>';
 
 /** Minify CSS with cssnano */
 const mod: HtmlnanoModule<CssnanoOptions> = {
@@ -59,18 +56,15 @@ function processStyleNode(styleNode: PostHTML.Node, cssnanoOptions: CssnanoOptio
     let css = extractCssFromStyleNode(styleNode);
     if (!css || css.trim() === '') return;
 
-    // Improve performance by avoiding calling stripCdata again and again
-    const { strippedCss, isCdataWrapped } = stripCdata(css);
+    // Improve performance by avoiding calling stripCssCdata again and again
+    const { strippedCss, isCdataWrapped } = stripCssCdata(css);
     css = strippedCss;
 
     return postcss([cssnano(cssnanoOptions)])
         .process(css, postcssOptions)
         .then((result) => {
-            if (isCdataWrapped) {
-                styleNode.content = ['<![CDATA[' + result.toString() + ']]>'];
-            } else {
-                styleNode.content = [result.css];
-            }
+            const minifiedCss = isCdataWrapped ? result.toString() : result.css;
+            styleNode.content = [wrapCssCdata(minifiedCss, isCdataWrapped)];
         });
 }
 
@@ -100,32 +94,4 @@ function processStyleAttr(node: PostHTML.Node, cssnanoOptions: CssnanoOptions, c
                 minifiedCss.length - wrapperEnd.length
             );
         });
-}
-
-function stripCdata(css: string) {
-    const trimmed = css.trim();
-    if (!trimmed.startsWith(cdataStart) || !trimmed.endsWith(cdataEnd)) {
-        return { strippedCss: css, isCdataWrapped: false };
-    }
-
-    const strippedCss = trimmed.slice(cdataStart.length, trimmed.length - cdataEnd.length);
-    return { strippedCss, isCdataWrapped: true };
-}
-
-function isCssStyleType(node: PostHTML.Node) {
-    if (!node.attrs || !('type' in node.attrs)) {
-        return true;
-    }
-
-    const rawType = node.attrs.type;
-    if (rawType === '') {
-        return true;
-    }
-
-    if (typeof rawType !== 'string') {
-        return false;
-    }
-
-    const normalizedType = rawType.trim().toLowerCase();
-    return /^text\/css(?:$|\s*;)/.test(normalizedType);
 }

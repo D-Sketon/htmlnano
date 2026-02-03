@@ -1,5 +1,5 @@
 import type PostHTML from 'posthtml';
-import { isStyleNode, extractCssFromStyleNode, optionalImport } from '../helpers';
+import { extractCssFromStyleNode, isCssStyleType, isStyleNode, optionalImport, stripCssCdata, wrapCssCdata } from '../helpers';
 import type { HtmlnanoModule, PostHTMLTreeLike } from '../types';
 import type { Options as PurgeCSSOptions } from 'purgecss';
 
@@ -12,7 +12,7 @@ const uncssOptions = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- uncss has no types
 function processStyleNodeUnCSS(html: string, styleNode: PostHTML.Node, uncssOptions: object, uncss: any) {
     const css = extractCssFromStyleNode(styleNode)!;
-    const { strippedCss, isCdataWrapped } = stripCdata(css);
+    const { strippedCss, isCdataWrapped } = stripCssCdata(css);
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- uncss no types
     return runUncss(html, strippedCss, uncssOptions, uncss).then((css) => {
@@ -23,7 +23,7 @@ function processStyleNodeUnCSS(html: string, styleNode: PostHTML.Node, uncssOpti
             styleNode.content = [];
             return;
         }
-        styleNode.content = [wrapCdata(css, isCdataWrapped)];
+        styleNode.content = [wrapCssCdata(css, isCdataWrapped)];
     });
 }
 
@@ -68,7 +68,7 @@ const purgeFromHtml = function (tree: PostHTMLTreeLike) {
 
 function processStyleNodePurgeCSS(tree: PostHTMLTreeLike, styleNode: PostHTML.Node, purgecssOptions: object, purgecss: typeof import('purgecss'), extractor: () => string[]) {
     const css = extractCssFromStyleNode(styleNode)!;
-    const { strippedCss, isCdataWrapped } = stripCdata(css);
+    const { strippedCss, isCdataWrapped } = stripCssCdata(css);
     return runPurgecss(tree, strippedCss, purgecssOptions, purgecss, extractor)
         .then((css) => {
             if (css.trim().length === 0) {
@@ -77,7 +77,7 @@ function processStyleNodePurgeCSS(tree: PostHTMLTreeLike, styleNode: PostHTML.No
                 styleNode.content = [];
                 return;
             }
-            styleNode.content = [wrapCdata(css, isCdataWrapped)];
+            styleNode.content = [wrapCssCdata(css, isCdataWrapped)];
         });
 }
 
@@ -153,49 +153,11 @@ const mod: HtmlnanoModule<RemoveUnusedCssOptions> = {
 
 export default mod;
 
-const cdataStart = '<![CDATA[';
-const cdataEnd = ']]>';
-
-function stripCdata(css: string) {
-    const trimmed = css.trim();
-    if (!trimmed.startsWith(cdataStart) || !trimmed.endsWith(cdataEnd)) {
-        return { strippedCss: css, isCdataWrapped: false };
-    }
-
-    const strippedCss = trimmed.slice(cdataStart.length, trimmed.length - cdataEnd.length);
-    return { strippedCss, isCdataWrapped: true };
-}
-
-function wrapCdata(css: string, isCdataWrapped: boolean) {
-    if (!isCdataWrapped) {
-        return css;
-    }
-    return `${cdataStart}${css}${cdataEnd}`;
-}
-
 function getSelectorTokens(value: unknown) {
     if (typeof value !== 'string') {
         return [];
     }
     return value.split(/\s+/).filter(Boolean);
-}
-
-function isCssStyleType(node: PostHTML.Node) {
-    if (!node.attrs || !('type' in node.attrs)) {
-        return true;
-    }
-
-    const rawType = node.attrs.type;
-    if (rawType === '') {
-        return true;
-    }
-
-    if (typeof rawType !== 'string') {
-        return false;
-    }
-
-    const normalizedType = rawType.trim().toLowerCase();
-    return /^text\/css(?:$|\s*;)/.test(normalizedType);
 }
 
 function resolveUserOptions(userOptions: RemoveUnusedCssOptions | true | null | undefined) {

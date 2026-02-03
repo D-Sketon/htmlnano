@@ -1,8 +1,7 @@
+import { normalizeMimeType } from '../helpers';
 import type { HtmlnanoModule } from '../types';
 
 const rNodeAttrsTypeJson = /(?:\/|\+)json$/i;
-
-const getMimeType = (type: string) => type.split(';', 1)[0]?.trim();
 
 const mod: HtmlnanoModule = {
     onContent() {
@@ -13,7 +12,7 @@ const mod: HtmlnanoModule = {
             }
 
             const nodeType = node.attrs && typeof node.attrs.type === 'string'
-                ? getMimeType(node.attrs.type)
+                ? normalizeMimeType(node.attrs.type)
                 : undefined;
 
             if (nodeType && rNodeAttrsTypeJson.test(nodeType)) {
