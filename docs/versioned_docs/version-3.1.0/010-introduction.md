@@ -5,8 +5,9 @@ slug: /
 
 # Introduction
 
-Modular HTML minifier, built on top of the [PostHTML](https://github.com/posthtml/posthtml).
+htmlnano is a modular HTML minifier built on top of [PostHTML](https://github.com/posthtml/posthtml).
 Inspired by [cssnano](http://cssnano.co/).
+
 
 ## Benchmarks
 

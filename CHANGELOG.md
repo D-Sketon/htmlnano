@@ -2,6 +2,34 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.0] - 2026-02-03
+
+This release touches almost whole htmlnano code.
+Minifier modules are fully covered by tests and many new edge cases were added, so I don’t expect regressions, but please be aware.
+
+### Added
+
+* `minifyHtmlTemplate` module to minify HTML inside template containers [#11].
+* `removeEmptyElements` module [#8].
+* `minifyAttributes` improvements: new module for meta refresh optimization and options for redundant whitespace handling [#37].
+* `removeComments` now supports a regex string in JSON config [#255].
+* Fallback SVG optimization.
+
+
+### Changed
+
+* Upgrade to PurgeCSS v8.
+* Expanded and hardened behavior across all minifier modules.
+* Updated SVGO peer dependency range to `^4.0.0` and synced peer/dev versions [#394].
+
+
+### Fixed
+
+* `minifyJs` preserves single quotes in handler attributes [#41].
+* `minifyJs` now pushes event-handler minification promises correctly [#398].
+* Fixed `removeUnusedCss` option typings [#401].
+
+
 ## [3.0.0] - 2025-12-22
 
 ### Changed
@@ -331,6 +359,7 @@ Otherwise, you have to adapt the config according to the new [PurgeCSS@3](https:
 - Remove attributes that contains only white spaces.
 
 
+[3.1.0]: https://github.com/maltsev/htmlnano/compare/3.0.0...3.1.0
 [3.0.0]: https://github.com/maltsev/htmlnano/compare/2.1.5...3.0.0
 [2.1.5]: https://github.com/maltsev/htmlnano/compare/2.1.4...2.1.5
 [2.1.4]: https://github.com/maltsev/htmlnano/compare/2.1.3...2.1.4
@@ -368,6 +397,9 @@ Otherwise, you have to adapt the config according to the new [PurgeCSS@3](https:
 [0.1.2]: https://github.com/maltsev/htmlnano/compare/0.1.1...0.1.2
 [0.1.1]: https://github.com/maltsev/htmlnano/compare/0.1.0...0.1.1
 
+[#401]: https://github.com/maltsev/htmlnano/issues/401
+[#398]: https://github.com/maltsev/htmlnano/issues/398
+[#394]: https://github.com/maltsev/htmlnano/issues/394
 [#373]: https://github.com/maltsev/htmlnano/issues/373
 [#342]: https://github.com/maltsev/htmlnano/issues/342
 [#336]: https://github.com/maltsev/htmlnano/issues/336
@@ -376,6 +408,7 @@ Otherwise, you have to adapt the config according to the new [PurgeCSS@3](https:
 [#278]: https://github.com/maltsev/htmlnano/issues/278
 [#260]: https://github.com/maltsev/htmlnano/issues/260
 [#257]: https://github.com/maltsev/htmlnano/issues/257
+[#255]: https://github.com/maltsev/htmlnano/issues/255
 [#220]: https://github.com/maltsev/htmlnano/issues/220
 [#197]: https://github.com/maltsev/htmlnano/issues/197
 [#195]: https://github.com/maltsev/htmlnano/issues/195
@@ -435,7 +468,9 @@ Otherwise, you have to adapt the config according to the new [PurgeCSS@3](https:
 [#48]: https://github.com/maltsev/htmlnano/issues/48
 [#47]: https://github.com/maltsev/htmlnano/issues/47
 [#42]: https://github.com/maltsev/htmlnano/issues/42
+[#41]: https://github.com/maltsev/htmlnano/issues/41
 [#39]: https://github.com/maltsev/htmlnano/issues/39
+[#37]: https://github.com/maltsev/htmlnano/issues/37
 [#36]: https://github.com/maltsev/htmlnano/issues/36
 [#31]: https://github.com/maltsev/htmlnano/issues/31
 [#30]: https://github.com/maltsev/htmlnano/issues/30
@@ -448,3 +483,5 @@ Otherwise, you have to adapt the config according to the new [PurgeCSS@3](https:
 [#19]: https://github.com/maltsev/htmlnano/issues/19
 [#17]: https://github.com/maltsev/htmlnano/issues/17
 [#13]: https://github.com/maltsev/htmlnano/issues/13
+[#11]: https://github.com/maltsev/htmlnano/issues/11
+[#8]: https://github.com/maltsev/htmlnano/issues/8
