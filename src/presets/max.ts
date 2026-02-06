@@ -4,11 +4,16 @@ import safePreset from './safe';
 /**
  * Maximal minification (might break some pages)
  */
-export default { ...safePreset,
+export default {
+    ...safePreset,
+    removeRedundantAttributes: true,
+    sortAttributes: true,
     collapseWhitespace: 'all',
     removeComments: 'all',
+    removeEmptyElements: true,
+    minifyConditionalComments: true,
+    removeOptionalTags: true,
     removeAttributeQuotes: true,
-    removeRedundantAttributes: true,
     minifyAttributes: {
         metaContent: true,
         redundantWhitespaces: 'agressive'
@@ -21,7 +26,5 @@ export default { ...safePreset,
     minifyCss: {
         preset: 'default'
     },
-    minifySvg: {},
-    minifyConditionalComments: true,
-    removeOptionalTags: true
+    minifySvg: {}
 } as HtmlnanoPreset;
