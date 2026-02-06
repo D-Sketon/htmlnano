@@ -1085,40 +1085,7 @@ Minified:
 
 Removes unused CSS inside `<style>` tags with either [uncss](https://github.com/uncss/uncss) or [PurgeCSS](https://github.com/FullHuman/purgecss).
 
-#### With uncss
-
-You have to install `uncss` in order to use this feature:
-
-```bash
-npm install --save-dev uncss
-# if you prefer yarn
-# yarn add --dev uncss
-# if you prefer pnpm
-# pnpm install --save-dev uncss
-```
-
-You can also use a maintained fork [@novaatwarren/uncss](https://www.npmjs.com/package/@novaatwarren/uncss) instead.
-
-
-##### Options
-See [the documentation of uncss](https://github.com/uncss/uncss) for all supported options.
-
-uncss options can be passed directly to the `removeUnusedCss` module:
-```js
-htmlnano.process(html, {
-    removeUnusedCss: {
-        ignore: ['.do-not-remove']
-    }
-});
-```
-
-The following uncss options are ignored if passed to the module:
-
--   `stylesheets`
--   `ignoreSheets`
--   `raw`
-
-#### With PurgeCSS
+#### With PurgeCSS (recommended)
 
 Use PurgeCSS instead of uncss by adding `tool: 'purgeCSS'` to the options.
 
@@ -1151,6 +1118,38 @@ The following PurgeCSS options are ignored if passed to the module:
 -   `content`
 -   `css`
 -   `extractors`
+
+#### With uncss
+
+`uncss` isn't maintained anymore, so I don't recommend using it.
+You have to install `uncss` in order to use this feature:
+
+```bash
+npm install --save-dev uncss
+# if you prefer yarn
+# yarn add --dev uncss
+# if you prefer pnpm
+# pnpm install --save-dev uncss
+```
+
+
+##### Options
+See [the documentation of uncss](https://github.com/uncss/uncss) for all supported options.
+
+uncss options can be passed directly to the `removeUnusedCss` module:
+```js
+htmlnano.process(html, {
+    removeUnusedCss: {
+        ignore: ['.do-not-remove']
+    }
+});
+```
+
+The following uncss options are ignored if passed to the module:
+
+-   `stylesheets`
+-   `ignoreSheets`
+-   `raw`
 
 #### Notes
 
