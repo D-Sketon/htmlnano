@@ -15,7 +15,9 @@ export default { ...safePreset,
     },
     mergeScripts: true,
     mergeStyles: true,
-    removeUnusedCss: {},
+    removeUnusedCss: {
+        tool: 'purgeCSS'
+    },
     minifyCss: {
         preset: 'default'
     },

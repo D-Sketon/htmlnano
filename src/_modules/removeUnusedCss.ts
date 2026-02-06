@@ -127,7 +127,7 @@ const mod: HtmlnanoModule<RemoveUnusedCssOptions> = {
         const uncss = await optionalImport('uncss');
 
         const resolvedOptions = resolveUserOptions(userOptions);
-        const tool = resolvedOptions.tool;
+        const tool = resolvedOptions.tool ?? 'purgeCSS';
         const toolOptions = stripToolOption(resolvedOptions);
 
         tree.walk((node) => {
@@ -137,7 +137,7 @@ const mod: HtmlnanoModule<RemoveUnusedCssOptions> = {
                         extractor ??= purgeFromHtml(tree);
                         promises.push(processStyleNodePurgeCSS(tree, node, toolOptions, purgecss, extractor));
                     }
-                } else {
+                } else if (tool === 'uncss') {
                     if (uncss) {
                         html ??= tree.render(tree);
                         promises.push(processStyleNodeUnCSS(html, node, toolOptions, uncss));

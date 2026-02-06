@@ -1,11 +1,12 @@
 import { init } from '../htmlnano.ts';
-import maxPreset from '../../dist/presets/max.mjs';
 
 describe('removeUnusedCss (uncss)', function () {
     this.timeout(3000);
 
     const options = {
-        removeUnusedCss: maxPreset.removeUnusedCss
+        removeUnusedCss: {
+            tool: 'uncss' as const
+        }
     };
     const html = `<div><style>
         div.b {
@@ -45,6 +46,7 @@ describe('removeUnusedCss (uncss)', function () {
     </style></div><p class="b">hello</p>`,
             {
                 removeUnusedCss: {
+                    tool: 'uncss',
                     ignore: ['.c']
                 }
             }
@@ -56,7 +58,7 @@ describe('removeUnusedCss (uncss)', function () {
             html,
             '<div><style>.b{color:red}</style></div><p class="b">hello</p>',
             {
-                removeUnusedCss: maxPreset.removeUnusedCss,
+                removeUnusedCss: options.removeUnusedCss,
                 minifyCss: {}
             }
         );
@@ -69,7 +71,7 @@ describe('removeUnusedCss (uncss)', function () {
             ampHtml,
             ampHtml,
             {
-                removeUnusedCss: maxPreset.removeUnusedCss
+                removeUnusedCss: options.removeUnusedCss
             }
         );
     });
@@ -146,12 +148,28 @@ describe('removeUnusedCss (purgeCSS)', function () {
         );
     });
 
+    it('should use purgeCSS by default when tool is omitted', () => {
+        return init(
+            html,
+            `<div><style>
+        .b {
+            color: red;
+        }
+    </style></div><p class="b">hello</p>`,
+            {
+                removeUnusedCss: {
+                    ignore: ['.c']
+                }
+            }
+        );
+    });
+
     it('should work with minifyCss', () => {
         return init(
             html,
             '<div><style>.b{color:red}</style></div><p class="b">hello</p>',
             {
-                removeUnusedCss: maxPreset.removeUnusedCss,
+                removeUnusedCss: options.removeUnusedCss,
                 minifyCss: {}
             }
         );
