@@ -1,8 +1,10 @@
 import type PostHTML from 'posthtml';
 import { extractTextContentFromNode, isAmpBoilerplate } from '../helpers';
 import type { HtmlnanoModule } from '../types';
+import { normalizeAttrsForKey } from './helpers/normalizeAttrsForKey';
 
 const booleanAttrs = new Set(['amp-custom', 'disabled']);
+const skippedAttrs = new Set(['type', 'media']);
 
 function normalizeStyleType(attrs: PostHTML.NodeAttributes) {
     if (!attrs || typeof attrs.type !== 'string') {
@@ -23,26 +25,10 @@ function normalizeStyleMedia(attrs: PostHTML.NodeAttributes) {
 }
 
 function normalizeStyleAttrsForKey(attrs: PostHTML.NodeAttributes) {
-    const normalized: Record<string, string | boolean> = {};
-
-    for (const [key, value] of Object.entries(attrs || {})) {
-        if (key === 'type' || key === 'media') {
-            continue;
-        }
-
-        if (value === undefined) {
-            continue;
-        }
-
-        if (booleanAttrs.has(key)) {
-            normalized[key] = true;
-            continue;
-        }
-
-        normalized[key] = value as string | boolean;
-    }
-
-    return normalized;
+    return normalizeAttrsForKey(attrs, {
+        booleanAttrs,
+        skippedAttrs
+    });
 }
 
 function buildStyleKey(attrs: PostHTML.NodeAttributes) {

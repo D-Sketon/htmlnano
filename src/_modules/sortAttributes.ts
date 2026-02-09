@@ -1,14 +1,9 @@
 import type { HtmlnanoModule, PostHTMLTreeLike } from '../types';
+import {
+    resolveSortType
 
-type ValidOptions = 'alphabetical' | 'frequency';
-const validOptions = new Set(['frequency', 'alphabetical']);
-
-const processModuleOptions = (options: boolean | ValidOptions): ValidOptions | false => {
-    if (options === true) return 'alphabetical';
-    if (options === false) return false;
-
-    return validOptions.has(options) ? options : false;
-};
+} from './helpers/sortAttributesShared';
+import type { SortAttributesOption } from './helpers/sortAttributesShared';
 
 class AttributeTokenChain {
     /** <attr, frequency> */
@@ -77,9 +72,9 @@ class AttributeTokenChain {
 }
 
 /** Sort attibutes */
-const mod: HtmlnanoModule<boolean | ValidOptions> = {
+const mod: HtmlnanoModule<boolean | SortAttributesOption> = {
     default(tree, options, moduleOptions) {
-        const sortType = processModuleOptions(moduleOptions);
+        const sortType = resolveSortType(moduleOptions);
 
         if (sortType === 'alphabetical') {
             return sortAttributesInAlphabeticalOrder(tree);

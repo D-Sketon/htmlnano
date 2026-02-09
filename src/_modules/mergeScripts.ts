@@ -1,6 +1,7 @@
 import type PostHTML from 'posthtml';
 import type { HtmlnanoModule } from '../types';
 import { extractTextContentFromNode } from '../helpers';
+import { normalizeAttrsForKey } from './helpers/normalizeAttrsForKey';
 
 type ScriptTracking = {
     mergedScriptNodes: WeakSet<PostHTML.Node>;
@@ -32,30 +33,14 @@ function isMergeableScriptType(type: string) {
 }
 
 const booleanAttrs = new Set(['async', 'defer', 'nomodule']);
+const skippedAttrs = new Set(['src', 'integrity', 'type']);
 
 function normalizeScriptAttrsForKey(attrs: PostHTML.NodeAttributes, scriptType: string) {
-    const normalized: Record<string, string | boolean> = {
-        type: scriptType
-    };
-
-    for (const [key, value] of Object.entries(attrs)) {
-        if (key === 'src' || key === 'integrity' || key === 'type') {
-            continue;
-        }
-
-        if (value === undefined) {
-            continue;
-        }
-
-        if (booleanAttrs.has(key)) {
-            normalized[key] = true;
-            continue;
-        }
-
-        normalized[key] = value as string | boolean;
-    }
-
-    return normalized;
+    return normalizeAttrsForKey(attrs, {
+        baseAttrs: { type: scriptType },
+        booleanAttrs,
+        skippedAttrs
+    });
 }
 
 function buildScriptKey(attrs: PostHTML.NodeAttributes, scriptType: string, scriptSrcIndex: number) {

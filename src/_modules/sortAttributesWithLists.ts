@@ -1,20 +1,16 @@
 // class, rel, ping
 import type { HtmlnanoModule, PostHTMLTreeLike } from '../types';
 import { isListAttribute } from './collapseAttributeWhitespace';
+import {
+    resolveSortType
 
-type ValidOptions = 'alphabetical' | 'frequency';
-const validOptions = new Set(['frequency', 'alphabetical']);
+} from './helpers/sortAttributesShared';
+import type { SortAttributesOption } from './helpers/sortAttributesShared';
 
-const processModuleOptions = (options: boolean | ValidOptions): ValidOptions | false => {
-    if (options === true) return 'alphabetical';
-    if (options === false) return false;
-
-    return validOptions.has(options) ? options : false;
-};
-class AttributeTokenChain {
+class ListAttributeTokenChain {
     /** <attr, frequency> */
-    freqData = new Map<string, number>();
-    sortOrder: string[] | null = null;
+    tokenCounts = new Map<string, number>();
+    sortedTokens: string[] | null = null;
 
     addFromNodeAttrsArray(attrValuesArray: string[]) {
         attrValuesArray.forEach((attrValue) => {
@@ -22,19 +18,19 @@ class AttributeTokenChain {
                 return;
             }
 
-            if (this.freqData.has(attrValue)) {
-                this.freqData.set(attrValue, this.freqData.get(attrValue)! + 1);
+            if (this.tokenCounts.has(attrValue)) {
+                this.tokenCounts.set(attrValue, this.tokenCounts.get(attrValue)! + 1);
             } else {
-                this.freqData.set(attrValue, 1);
+                this.tokenCounts.set(attrValue, 1);
             }
         });
     }
 
     createSortOrder() {
-        const _sortOrder = [...this.freqData.entries()];
-        _sortOrder.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+        const nextSortOrder = [...this.tokenCounts.entries()];
+        nextSortOrder.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 
-        this.sortOrder = _sortOrder.map(i => i[0]);
+        this.sortedTokens = nextSortOrder.map(i => i[0]);
     }
 
     sortFromNodeAttrsArray(attrValuesArray: string[]) {
@@ -49,11 +45,11 @@ class AttributeTokenChain {
             tokenCounts.set(attrValue, (tokenCounts.get(attrValue) ?? 0) + 1);
         });
 
-        if (!this.sortOrder) {
+        if (!this.sortedTokens) {
             this.createSortOrder();
         }
 
-        this.sortOrder!.forEach((k) => {
+        this.sortedTokens!.forEach((k) => {
             const count = tokenCounts.get(k);
             if (!count) {
                 return;
@@ -69,9 +65,9 @@ class AttributeTokenChain {
 }
 
 /** Sort values inside list-like attributes (e.g. class, rel) */
-const mod: HtmlnanoModule<boolean | 'alphabetical' | 'frequency'> = {
+const mod: HtmlnanoModule<boolean | SortAttributesOption> = {
     default(tree, options, moduleOptions) {
-        const sortType = processModuleOptions(moduleOptions);
+        const sortType = resolveSortType(moduleOptions);
 
         if (sortType === 'alphabetical') {
             return sortAttributesWithListsInAlphabeticalOrder(tree);
@@ -90,7 +86,10 @@ export default mod;
 
 const splitListAttributeValues = (attrValue: string) => attrValue.split(/\s+/).filter(Boolean);
 
-function sortAttributesWithListsInAlphabeticalOrder(tree: PostHTMLTreeLike) {
+function walkListAttributes(
+    tree: PostHTMLTreeLike,
+    walkFn: (nodeAttrs: Record<string, string | void>, attrName: string, attrValues: string) => void
+) {
     tree.walk((node) => {
         if (!node.attrs) {
             return node;
@@ -98,75 +97,55 @@ function sortAttributesWithListsInAlphabeticalOrder(tree: PostHTMLTreeLike) {
 
         const tagName = node.tag ? node.tag.toLowerCase() : undefined;
 
-        Object.keys(node.attrs).forEach((attrName) => {
+        Object.entries(node.attrs).forEach(([attrName, attrValues]) => {
             const attrNameLower = attrName.toLowerCase();
-            if (!isListAttribute(attrNameLower, tagName)) {
+            if (!isListAttribute(attrNameLower, tagName) || typeof attrValues !== 'string') {
                 return;
             }
 
-            const attrValues = splitListAttributeValues(node.attrs![attrName]!);
-            if (attrValues.length < 2) {
-                return;
-            }
-
-            node.attrs![attrName] = attrValues.sort((a, b) => {
-                // @ts-expect-error -- deliberately use minus operator to sort things
-                return typeof a.localeCompare === 'function' ? a.localeCompare(b) : a - b;
-            }).join(' ');
+            walkFn(node.attrs!, attrName, attrValues);
         });
 
         return node;
+    });
+}
+
+function sortAttributesWithListsInAlphabeticalOrder(tree: PostHTMLTreeLike) {
+    walkListAttributes(tree, (nodeAttrs, attrName, attrValues) => {
+        const values = splitListAttributeValues(attrValues);
+        if (values.length < 2) {
+            return;
+        }
+
+        nodeAttrs[attrName] = values.sort((a, b) => {
+            // @ts-expect-error -- deliberately use minus operator to sort things
+            return typeof a.localeCompare === 'function' ? a.localeCompare(b) : a - b;
+        }).join(' ');
     });
 
     return tree;
 }
 
 function sortAttributesWithListsByFrequency(tree: PostHTMLTreeLike) {
-    const tokenChainObj: Record<string, AttributeTokenChain> = {}; // <attrNameLower: AttributeTokenChain>[]
+    const tokenChainObj: Record<string, ListAttributeTokenChain> = {};
 
     // Traverse through tree to get frequency
-    tree.walk((node) => {
-        if (!node.attrs) {
-            return node;
-        }
-
-        const tagName = node.tag ? node.tag.toLowerCase() : undefined;
-
-        Object.entries(node.attrs).forEach(([attrName, attrValues]) => {
-            const attrNameLower = attrName.toLowerCase();
-
-            if (!isListAttribute(attrNameLower, tagName)) {
-                return;
-            }
-
-            tokenChainObj[attrNameLower] = tokenChainObj[attrNameLower] || new AttributeTokenChain();
-            tokenChainObj[attrNameLower].addFromNodeAttrsArray(splitListAttributeValues(attrValues!));
-        });
-
-        return node;
+    walkListAttributes(tree, (_nodeAttrs, attrName, attrValues) => {
+        const attrNameLower = attrName.toLowerCase();
+        tokenChainObj[attrNameLower] = tokenChainObj[attrNameLower] || new ListAttributeTokenChain();
+        tokenChainObj[attrNameLower].addFromNodeAttrsArray(splitListAttributeValues(attrValues));
     });
 
     // Traverse through tree again, this time sort the attribute values
-    tree.walk((node) => {
-        if (!node.attrs) {
-            return node;
+    walkListAttributes(tree, (nodeAttrs, attrName, attrValues) => {
+        const attrNameLower = attrName.toLowerCase();
+        if (!tokenChainObj[attrNameLower]) {
+            return;
         }
 
-        const tagName = node.tag ? node.tag.toLowerCase() : undefined;
-
-        Object.entries(node.attrs).forEach(([attrName, attrValues]) => {
-            const attrNameLower = attrName.toLowerCase();
-
-            if (!isListAttribute(attrNameLower, tagName)) {
-                return;
-            }
-
-            if (tokenChainObj[attrNameLower]) {
-                node.attrs![attrName] = tokenChainObj[attrNameLower].sortFromNodeAttrsArray(splitListAttributeValues(attrValues!)).join(' ');
-            }
-        });
-
-        return node;
+        nodeAttrs[attrName] = tokenChainObj[attrNameLower]
+            .sortFromNodeAttrsArray(splitListAttributeValues(attrValues))
+            .join(' ');
     });
 
     return tree;
