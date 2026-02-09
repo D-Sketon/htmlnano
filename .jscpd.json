@@ -1,0 +1,13 @@
+{
+  "path": [
+    "src"
+  ],
+  "ignore": [
+    "**/*.d.ts"
+  ],
+  "gitignore": true,
+  "reporters": [
+    "consoleFull"
+  ],
+  "threshold": 1
+}
