@@ -1,0 +1,21 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/index.ts",
+    "src/bin/index.ts",
+    "test/**/*.ts"
+  ],
+  "project": [
+    "src/**/*.ts",
+    "test/**/*.ts"
+  ],
+  "ignore": [
+    "src/_modules/example.ts"
+  ],
+  "ignoreDependencies": [
+    "uncss"
+  ],
+  "rules": {
+    "optionalPeerDependencies": "off"
+  }
+}
