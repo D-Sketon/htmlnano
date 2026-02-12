@@ -96,6 +96,14 @@ describe('minifyJs', () => {
         );
     });
 
+    it('should skip invalid JS inside on* attributes', () => {
+        return init(
+            '<a href="#" onclick="return = ;">click</a>',
+            '<a href="#" onclick="return = ;">click</a>',
+            options
+        );
+    });
+
     it('should minify JS with `this` inside on* attributes ', () => {
         return init(
             '<video oncanplay="this.currentTime = 1.2; this.oncanplay=null;"></video>',

@@ -235,9 +235,25 @@ function processNodeWithOnAttrs(node: PostHTML.Node, terserOptions: MinifyOption
                     );
                     node.attrs![attrName] = minifiedJs;
                 }
+            })
+            .catch((error: unknown) => {
+                // Skip invalid inline handler code and preserve the original value.
+                if (isTerserParseError(error)) {
+                    return;
+                }
+
+                throw error;
             });
         promises.push(promise);
     }
 
     return promises;
+}
+
+function isTerserParseError(error: unknown) {
+    if (!(error instanceof Error)) {
+        return false;
+    }
+
+    return error.name === 'SyntaxError' || error.message.includes('JS_Parse_Error');
 }
