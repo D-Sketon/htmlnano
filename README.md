@@ -46,7 +46,7 @@ Also, you can use it as CLI tool:
 node_modules/.bin/htmlnano --help
 ```
 
-More usage examples (PostHTML, Gulp, Webpack): https://htmlnano.netlify.app/next/usage
+More usage examples (PostHTML, CLI, Webpack): https://htmlnano.netlify.app/usage
 
 
 ## Benchmarks
