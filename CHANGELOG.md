@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.1] - 2026-02-28
+
+### Changed
+
+* Refactor attribute normalization and sorting to avoid code duplication.
+* Make `max` preset more aggresive.
+* Use `purgeCSS` and default tool in `removeUnusedCss`.
+
+### Fixed
+
+* Handle exceptions raised by Terser.
+
 ## [3.1.0] - 2026-02-03
 
 This release touches almost the whole htmlnano code.
@@ -359,6 +371,7 @@ Otherwise, you have to adapt the config according to the new [PurgeCSS@3](https:
 - Remove attributes that contains only white spaces.
 
 
+[3.1.1]: https://github.com/maltsev/htmlnano/compare/3.1.0...3.1.1
 [3.1.0]: https://github.com/maltsev/htmlnano/compare/3.0.0...3.1.0
 [3.0.0]: https://github.com/maltsev/htmlnano/compare/2.1.5...3.0.0
 [2.1.5]: https://github.com/maltsev/htmlnano/compare/2.1.4...2.1.5
