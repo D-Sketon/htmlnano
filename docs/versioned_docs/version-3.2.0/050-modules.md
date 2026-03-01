@@ -1119,7 +1119,6 @@ The following PurgeCSS options are ignored if passed to the module:
 -   `css`
 -   `extractors`
 
-
 #### With uncss
 
 `uncss` isn't maintained anymore, so I don't recommend using it.
