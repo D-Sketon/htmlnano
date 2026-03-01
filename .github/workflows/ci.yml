@@ -20,7 +20,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - run: npm install
-      - run: npm test
+
+      - if: matrix.node-version != 'current'
+        run: npm test
+
+      # Until https://github.com/bcoe/c8/issues/582 is fixed
+      - if: matrix.node-version == 'current'
+        run: npm run pretest && npm run test:mocha
 
   test-docs:
     name: Run tests for docs
