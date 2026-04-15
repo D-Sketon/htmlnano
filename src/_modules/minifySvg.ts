@@ -35,7 +35,7 @@ const mod: HtmlnanoModule<SvgoConfig> = {
                         console.error('htmlnano fails to minify the svg:');
                         console.error(error);
                     }
-                    let fallbackSvgStr = svgStr;
+                    let fallbackSvgStr: string;
                     try {
                         fallbackSvgStr = svgo.optimize(svgStr, { plugins: [] }).data;
                     } catch {
