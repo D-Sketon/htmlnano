@@ -268,17 +268,15 @@ const htmlnano = Object.assign(function htmlnano(optionsRun: HtmlnanoOptions = {
 export function getRequiredOptionalDependencies(optionsRun: HtmlnanoOptions, presetRun: HtmlnanoPreset) {
     const [options] = loadConfig(optionsRun, presetRun);
 
-    return Array.from(Object.keys(options).reduce<Set<string>>(
-        (acc, moduleName) => {
-            if (moduleName in optionalDependencies) {
-                const dependencies = optionalDependencies[moduleName as keyof typeof optionalDependencies];
-                // eslint-disable-next-line @typescript-eslint/unbound-method -- thisArg provided by forEach
-                dependencies.forEach(acc.add, acc);
-            }
-            return acc;
-        },
-        new Set()
-    ));
+    const dependencies = Object.keys(options).flatMap((moduleName) => {
+        if (moduleName in optionalDependencies) {
+            return optionalDependencies[moduleName as keyof typeof optionalDependencies];
+        }
+
+        return [];
+    });
+
+    return [...new Set(dependencies)];
 }
 
 export function process(

@@ -97,16 +97,9 @@ function sortAttributesInAlphabeticalOrder(tree: PostHTMLTreeLike) {
             return node;
         }
 
-        const newAttrs: Record<string, string | void> = {};
-
-        Object.keys(node.attrs)
-            // @ts-expect-error -- deliberately use minus operator to sort things
-            .sort((a, b) => typeof a.localeCompare === 'function' ? a.localeCompare(b) : a - b)
-            .forEach((attr) => {
-                newAttrs[attr] = node.attrs![attr];
-            });
-
-        node.attrs = newAttrs;
+        node.attrs = Object.fromEntries(
+            Object.entries(node.attrs).sort(([attrA], [attrB]) => attrA.localeCompare(attrB))
+        );
 
         return node;
     });

@@ -49,14 +49,8 @@ function buildScriptKey(attrs: PostHTML.NodeAttributes, scriptType: string, scri
         index: scriptSrcIndex,
         ...normalizedAttrs
     };
-    const sortedKeys = Object.keys(keyObject).sort();
-    const sortedKeyObject: Record<string, string | boolean | number> = {};
 
-    for (const key of sortedKeys) {
-        sortedKeyObject[key] = keyObject[key];
-    }
-
-    return JSON.stringify(sortedKeyObject);
+    return JSON.stringify(Object.fromEntries(Object.entries(keyObject).sort()));
 }
 
 function endsWithLineComment(scriptContent: string) {

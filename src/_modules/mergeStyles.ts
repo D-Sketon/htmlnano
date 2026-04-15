@@ -37,14 +37,8 @@ function buildStyleKey(attrs: PostHTML.NodeAttributes) {
         media: normalizeStyleMedia(attrs),
         ...normalizeStyleAttrsForKey(attrs)
     };
-    const sortedKeys = Object.keys(keyObject).sort();
-    const sortedKeyObject: Record<string, string | boolean> = {};
 
-    for (const key of sortedKeys) {
-        sortedKeyObject[key] = keyObject[key];
-    }
-
-    return JSON.stringify(sortedKeyObject);
+    return JSON.stringify(Object.fromEntries(Object.entries(keyObject).sort()));
 }
 
 function extractStyleTextContent(node: PostHTML.Node) {
