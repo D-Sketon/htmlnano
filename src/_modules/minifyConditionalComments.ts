@@ -11,7 +11,7 @@ async function minifyConditionalComments(tree: PostHTMLNodeLike[], htmlnanoOptio
 async function minifyConditionalComments(tree: PostHTMLTreeLike | PostHTMLNodeLike[], htmlnanoOptions: Partial<HtmlnanoOptions>) {
     // forEach, tree.walk, tree.match just don't support Promise.
     for (let i = 0, len = tree.length; i < len; i++) {
-        const node = tree[i] as PostHTMLNodeLike;
+        const node = tree[i];
 
         if (typeof node === 'string') {
             if (isConditionalComment(node)) {

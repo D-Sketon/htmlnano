@@ -4,7 +4,9 @@ import type { Options as CssNanoOptions } from 'cssnano';
 import type { Config as SvgoOptimizeOptions } from 'svgo';
 import type { UserDefinedOptions as PurgeCSSOptions } from 'purgecss';
 
-export type PostHTMLTreeLike = [PostHTML.Node] & PostHTML.NodeAPI & {
+export type PostHTMLNodeLike = PostHTML.Node | string;
+
+export type PostHTMLTreeLike = [PostHTMLNodeLike] & PostHTML.NodeAPI & {
     options?: {
         quoteAllAttributes?: boolean | undefined;
         quoteStyle?: 0 | 1 | 2 | undefined;
@@ -13,12 +15,10 @@ export type PostHTMLTreeLike = [PostHTML.Node] & PostHTML.NodeAPI & {
 
     render(): string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any -- posthtml render options are untyped
-    render(node: PostHTML.Node | PostHTMLTreeLike, renderOptions?: any): string;
+    render(node: PostHTMLNodeLike | PostHTMLTreeLike, renderOptions?: any): string;
 };
 
 type MaybeArray<T> = T | Array<T>;
-
-export type PostHTMLNodeLike = PostHTML.Node | string;
 
 export type HtmlnanoTemplateRule = {
     tag: string;
@@ -65,6 +65,7 @@ export interface HtmlnanoOptions {
     removeUnusedCss?: boolean
         | ({ tool: 'purgeCSS' } & Omit<PurgeCSSOptions, 'content' | 'css' | 'extractors'>)
         | {
+            tool?: 'uncss';
             banner?: boolean;
             csspath?: string;
             htmlroot?: string;
@@ -98,9 +99,11 @@ export type HtmlnanoModuleNodeHandler = (node: PostHTMLNodeLike) => PostHTML.Nod
 // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type -- match any functions deliberately
 type OptionalOptions<T> = T extends boolean | string | Function | number | null | undefined
     ? T
-    : T extends object
-        ? Partial<T>
-        : T;
+    : T extends Array<infer Item>
+        ? Array<Item>
+        : T extends object
+            ? Partial<T>
+            : T;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any -- module options default to any
 export type HtmlnanoModule<Options = any> = {
     onAttrs?: (options: Partial<HtmlnanoOptions>, moduleOptions: OptionalOptions<Options>) => HtmlnanoModuleAttrsHandler;

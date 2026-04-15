@@ -182,7 +182,9 @@ const mod: HtmlnanoModule<MinifyAttributesOptions> = {
         const normalizedOptions = normalizeOptions(moduleOptions);
 
         return (attrs, node) => {
-            if (normalizedOptions.metaContent && isMetaRefresh(attrs, node.tag)) {
+            const tagName = typeof node.tag === 'string' ? node.tag.toLowerCase() : undefined;
+
+            if (normalizedOptions.metaContent && isMetaRefresh(attrs, tagName)) {
                 const content = attrs.content;
                 if (typeof content === 'string') {
                     const minified = minifyMetaRefreshValue(content);
@@ -193,8 +195,6 @@ const mod: HtmlnanoModule<MinifyAttributesOptions> = {
             }
 
             if (normalizedOptions.redundantWhitespaces) {
-                const tagName = node.tag ? node.tag.toLowerCase() : undefined;
-
                 Object.entries(attrs).forEach(([attrName, attrValue]) => {
                     if (typeof attrValue !== 'string') return;
 

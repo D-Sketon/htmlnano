@@ -1,3 +1,4 @@
+import { expect } from 'expect';
 import { init } from '../htmlnano.ts';
 import safePreset from '../../dist/presets/safe.mjs';
 import maxPreset from '../../dist/presets/max.mjs';
@@ -6,26 +7,31 @@ import ampSafePreset from '../../dist/presets/ampSafe.mjs';
 describe('minifyUrls', () => {
     it('shouldn\'t be enabled with safe preset', () => {
         const html = '<a href="https://example.com/foo/bar/baz">bar</a>';
+        expect(safePreset.minifyUrls).toBe(false);
         return init(html, html, {
-            minifyUrls: safePreset.minifyUrls
+            minifyUrls: false
         });
     });
 
     it('shouldn\'t be enabled with max preset', () => {
         const html = '<a href="https://example.com/foo/bar/baz">bar</a>';
-        return init(html, html, { minifyUrls: maxPreset.minifyUrls });
+        expect(maxPreset.minifyUrls).toBe(false);
+        return init(html, html, { minifyUrls: false });
     });
 
     it('shouldn\'t be enabled with ampSafe preset', () => {
         const html = '<a href="https://example.com/foo/bar/baz">bar</a>';
-        return init(html, html, { minifyUrls: ampSafePreset.minifyUrls });
+        expect(ampSafePreset.minifyUrls).toBe(false);
+        return init(html, html, { minifyUrls: false });
     });
 
     it('shouldn\'t be enabled with invalid configuration', () => {
         const html = '<a href="https://example.com/foo/bar/baz">bar</a>';
         return Promise.all([
+            // @ts-expect-error invalid configuration is ignored at runtime
             init(html, html, { minifyUrls: 1000 }),
             // "true" is not allowed since relateurl requires a URL instance for base
+            // @ts-expect-error invalid configuration is ignored at runtime
             init(html, html, { minifyUrls: true })
         ]);
     });
