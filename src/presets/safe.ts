@@ -50,7 +50,7 @@ export default {
     },
     minifyHtmlTemplate: true,
     minifyJs: {},
-    minifyJson: {},
+    minifyJson: true,
     minifySvg: {
         plugins: [
             {
