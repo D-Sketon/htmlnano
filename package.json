@@ -13,8 +13,9 @@
     "lint:duplicates": "jscpd",
     "lint:knip": "knip",
     "lint": "npm run lint:eslint && npm run lint:duplicates && npm run lint:knip",
-    "test:mocha": "mocha --timeout 5000 --require @swc-node/register --recursive --check-leaks --globals addresses 'test/**/*.ts'",
-    "pretest": "npm run lint && npm run compile",
+    "test:types": "tsc --noEmit -p tsconfig.typecheck.json",
+    "test:mocha": "mocha --timeout 5000 --require @swc-node/register --recursive --ignore 'test/typecheck/**/*.ts' --check-leaks --globals addresses 'test/**/*.ts'",
+    "pretest": "npm run lint && npm run compile && npm run test:types",
     "test": "c8 -r text -r html npm run test:mocha",
     "posttest": "c8 check-coverage --lines 87 --per-file",
     "prepare": "npm run compile"

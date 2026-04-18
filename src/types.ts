@@ -1,8 +1,4 @@
 import type PostHTML from 'posthtml';
-import type { MinifyOptions } from 'terser';
-import type { Options as CssNanoOptions } from 'cssnano';
-import type { Config as SvgoOptimizeOptions } from 'svgo';
-import type { UserDefinedOptions as PurgeCSSOptions } from 'purgecss';
 
 export type PostHTMLNodeLike = PostHTML.Node | string;
 
@@ -25,6 +21,55 @@ export type HtmlnanoTemplateRule = {
     attrs?: Record<string, string | boolean | void>;
 };
 export type MinifyHtmlTemplateOptions = boolean | HtmlnanoTemplateRule[];
+export type HtmlnanoMinifyCssOptions = object;
+export type HtmlnanoMinifyJsOptions = object;
+export type HtmlnanoMinifySvgOptions = object;
+export type HtmlnanoPurgeCssPattern = string | RegExp;
+export type HtmlnanoPurgeCssExtractorResultDetailed = {
+    attributes: {
+        names: string[];
+        values: string[];
+    };
+    classes: string[];
+    ids: string[];
+    tags: string[];
+    undetermined: string[];
+};
+export type HtmlnanoPurgeCssExtractorResult = HtmlnanoPurgeCssExtractorResultDetailed | string[];
+export type HtmlnanoPurgeCssDefaultExtractor = (content: string) => HtmlnanoPurgeCssExtractorResult;
+export type HtmlnanoPurgeCssSourceMapOptions = {
+    absolute?: boolean;
+    annotation?: boolean | string;
+    from?: string;
+    inline?: boolean;
+    prev?: boolean | object | string;
+    sourcesContent?: boolean;
+    to?: string;
+};
+export type HtmlnanoPurgeCssSafelist = HtmlnanoPurgeCssPattern[] | {
+    standard?: HtmlnanoPurgeCssPattern[];
+    deep?: RegExp[];
+    greedy?: RegExp[];
+    variables?: HtmlnanoPurgeCssPattern[];
+    keyframes?: HtmlnanoPurgeCssPattern[];
+};
+export interface HtmlnanoPurgeCssOptions {
+    tool: 'purgeCSS';
+    defaultExtractor?: HtmlnanoPurgeCssDefaultExtractor;
+    fontFace?: boolean;
+    keyframes?: boolean;
+    output?: string;
+    rejected?: boolean;
+    rejectedCss?: boolean;
+    sourceMap?: boolean | HtmlnanoPurgeCssSourceMapOptions;
+    stdin?: boolean;
+    stdout?: boolean;
+    variables?: boolean;
+    safelist?: HtmlnanoPurgeCssSafelist;
+    blocklist?: HtmlnanoPurgeCssPattern[];
+    skippedContentGlobs?: string[];
+    dynamicAttributes?: string[];
+}
 
 export interface HtmlnanoOptions {
     skipConfigLoading?: boolean;
@@ -41,16 +86,16 @@ export interface HtmlnanoOptions {
     minifyUrls?: URL | string | false;
     mergeStyles?: boolean;
     mergeScripts?: boolean;
-    minifyCss?: CssNanoOptions | boolean;
+    minifyCss?: HtmlnanoMinifyCssOptions | boolean;
     minifyHtmlTemplate?: MinifyHtmlTemplateOptions;
     minifyConditionalComments?: boolean;
-    minifyJs?: MinifyOptions | boolean;
+    minifyJs?: HtmlnanoMinifyJsOptions | boolean;
     minifyJson?: boolean;
     minifyAttributes?: boolean | {
         metaContent?: boolean;
         redundantWhitespaces?: 'safe' | 'agressive' | false;
     };
-    minifySvg?: SvgoOptimizeOptions | boolean;
+    minifySvg?: HtmlnanoMinifySvgOptions | boolean;
     normalizeAttributeValues?: boolean;
     removeAttributeQuotes?: boolean | {
         force?: boolean;
@@ -63,7 +108,7 @@ export interface HtmlnanoOptions {
     removeRedundantAttributes?: boolean;
     removeOptionalTags?: boolean;
     removeUnusedCss?: boolean
-        | ({ tool: 'purgeCSS' } & Omit<PurgeCSSOptions, 'content' | 'css' | 'extractors'>)
+        | HtmlnanoPurgeCssOptions
         | {
             tool?: 'uncss';
             banner?: boolean;
