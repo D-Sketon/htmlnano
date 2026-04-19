@@ -831,6 +831,8 @@ Skipped nodes:
 
 Notes:
 - `style` attributes are wrapped in a temporary selector (`a{...}`) before minification so cssnano can parse them, then the wrapper is removed.
+- When htmlnano uses cssnano's `default` preset for `style` attributes, it disables inline-irrelevant optimizations such as `mergeRules`, `minifySelectors`, `minifyParams`, `normalizeCharset`, `uniqueSelectors`, and `normalizeUnicode`.
+- If you explicitly configure any of those plugins in `preset: ['default', ...]`, or pass a custom cssnano `plugins` list, htmlnano keeps your settings instead of overwriting them.
 
 You have to install `cssnano` and `postcss` in order to use this feature:
 
