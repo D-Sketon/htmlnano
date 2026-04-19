@@ -88,6 +88,12 @@ describe('[helpers]', () => {
         it('should return null when module not found', async () => {
             expect(await optionalImport('null')).toBe(null);
         });
+
+        it('should rethrow non-module-not-found errors', async () => {
+            const moduleUrl = `${process.cwd()}/test/fixtures/optionalImportThrows.cjs`;
+
+            await expect(optionalImport(moduleUrl)).rejects.toThrow('optional import boom');
+        });
     });
 
     context('extractTextContentFromNode()', () => {
