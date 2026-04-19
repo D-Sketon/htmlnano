@@ -2,6 +2,7 @@ import { expect } from 'expect';
 import type { Expect } from 'expect';
 import {
     extractCssFromStyleNode,
+    extractTextContentFromNode,
     isAmpBoilerplate,
     isComment,
     isConditionalComment,
@@ -11,7 +12,7 @@ import {
     optionalImport,
     stripCssCdata,
     wrapCssCdata
-} from '../dist/helpers.mjs';
+} from '../src/helpers.ts';
 
 describe('[helpers]', () => {
     context('isAmpBoilerplate()', () => {
@@ -86,6 +87,20 @@ describe('[helpers]', () => {
 
         it('should return null when module not found', async () => {
             expect(await optionalImport('null')).toBe(null);
+        });
+    });
+
+    context('extractTextContentFromNode()', () => {
+        it('should extract only string children from node content arrays', () => {
+            expect(extractTextContentFromNode({
+                tag: 'div',
+                content: ['hello', { tag: 'span', content: ['ignored'] }, ' world']
+            })).toBe('hello world');
+        });
+
+        it('should return empty string for missing or non-array content', () => {
+            expect(extractTextContentFromNode({ tag: 'div' })).toBe('');
+            expect(extractTextContentFromNode({ tag: 'div', content: 'hello' })).toBe('');
         });
     });
 
